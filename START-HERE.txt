@@ -1,0 +1,32 @@
+CLOUDY AI - HOW TO GET YOUR APK (6 steps)
+
+After extracting this zip you must see exactly 5 things:
+   .github          (folder)
+   www              (folder)
+   package.json
+   capacitor.config.json
+   START-HERE.txt
+
+1. Go to github.com and open your cloudy-ai repository.
+
+2. Click: Add file -> Upload files
+
+3. Drag ALL 5 items above into the upload box at once.
+   (Drag the .github folder and the www folder themselves, whole.)
+
+4. Click the green "Commit changes" button.
+
+5. Click the "Actions" tab at the top. A build called
+   "Build APK" starts by itself. Wait for the green tick
+   (about 5-8 minutes).
+
+6. Click the finished run -> scroll down to "Artifacts" ->
+   download "CloudyAI-APK". Unzip it -> inside is
+   app-debug.apk -> send it to your phone -> tap -> Install.
+
+Open the app: create your name + password, go to BOOTH,
+load a beat, press RECORD. First time only, tap "Allow"
+when it asks for the microphone.
+
+If the upload box refuses the .github folder, tell Claude -
+there is a 1-minute fallback.

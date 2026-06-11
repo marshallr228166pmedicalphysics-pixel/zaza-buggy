@@ -1,0 +1,8 @@
+{
+  "appId": "com.zaza.cloudyai",
+  "appName": "Cloudy AI",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

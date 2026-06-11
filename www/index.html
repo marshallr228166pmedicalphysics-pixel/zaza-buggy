@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cloudy AI">
+<meta name="theme-color" content="#080810">
+<title>Cloudy AI Studio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#080810;color:#e2e8f0;font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;max-width:430px;margin:0 auto;position:relative}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none}
+input{font-family:'Inter',sans-serif}
+::-webkit-scrollbar{display:none}
+
+/* LAYOUT */
+#app{display:flex;flex-direction:column;min-height:100vh}
+#screen{flex:1;overflow-y:auto;padding-bottom:90px}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(6,6,12,0.97);border-top:1px solid #1e293b;display:flex;padding:10px 0 20px;z-index:100;backdrop-filter:blur(10px)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 0}
+.nav-icon{font-size:20px}
+.nav-label{font-size:8px;font-weight:800;letter-spacing:1px;transition:color 0.2s}
+.nav-dot{width:16px;height:2px;background:#f59e0b;border-radius:1px;margin-top:2px}
+
+/* CARDS */
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:18px;margin-bottom:14px}
+.card-accent{border:1.5px solid}
+
+/* PLUGIN CARDS */
+.plugin-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-radius:14px;transition:background 0.2s}
+.plugin-slot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;border:1.5px solid}
+.plugin-body{padding:0 18px 20px}
+
+/* STEPS */
+.step-row{display:flex;gap:12px;margin-bottom:12px;cursor:pointer;transition:opacity 0.2s}
+.step-num{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;border:2px solid;transition:all 0.2s}
+.step-do{font-size:13px;font-weight:700;line-height:1.4;transition:all 0.2s}
+.step-where{font-size:11px;color:#475569;margin-top:3px;line-height:1.4}
+
+/* INFO BOXES */
+.box{border-radius:10px;padding:14px;margin-bottom:10px}
+.box-what{background:#080810;border-left:3px solid}
+.box-why{background:#0f2710;border:1px solid rgba(16,185,129,0.2)}
+.box-hear{background:#0a0f20;border:1px solid}
+.box-warn{background:#1a0a0a;border:1px solid rgba(239,68,68,0.25)}
+.box-label{font-size:10px;font-weight:800;letter-spacing:1.5px;margin-bottom:6px}
+.box-text{font-size:12px;color:#94a3b8;line-height:1.7}
+
+/* DAW TABS */
+.daw-tabs{display:flex;gap:6px;padding:0 0 16px;overflow-x:auto}
+.daw-tab{padding:8px 14px;border-radius:8px;border:1.5px solid #1e293b;background:#0f172a;font-size:10px;font-weight:800;letter-spacing:1px;white-space:nowrap;cursor:pointer;transition:all 0.2s}
+
+/* PROGRESS */
+.progress-bar{width:40px;height:3px;background:#1e293b;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.3s}
+
+/* SETTINGS TABLE */
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #1e293b}
+.setting-row:last-child{border-bottom:none}
+.setting-key{font-size:12px;color:#94a3b8}
+.setting-val{font-size:12px;font-weight:800}
+
+/* HERO */
+.hero{border-radius:18px;padding:22px;border:1.5px solid;margin-bottom:16px}
+
+/* RULES */
+.rule-card{display:flex;gap:14px;align-items:flex-start;background:#0f172a;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e293b}
+.rule-icon-box{width:42px;height:42px;border-radius:10px;background:rgba(99,102,241,0.1);border:1.5px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.rule-title{font-size:13px;font-weight:800;color:#e2e8f0;line-height:1.4;margin-bottom:4px}
+.rule-why{font-size:12px;color:#64748b;line-height:1.5}
+
+/* EQ */
+.eq-card{background:#0f172a;border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid #1e293b;border-left:4px solid}
+.eq-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.eq-freq{font-size:14px;font-weight:900}
+.eq-action{font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px}
+
+/* UTILITIES */
+.pad{padding:20px}
+.mt4{margin-top:4px}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+.gap8{gap:8px}
+.flex{display:flex}
+.flex-col{flex-direction:column}
+.items-center{align-items:center}
+.items-start{align-items:flex-start}
+.justify-between{justify-content:space-between}
+.flex1{flex:1}
+.fw800{font-weight:800}
+.fw900{font-weight:900}
+.fs9{font-size:9px}
+.fs10{font-size:10px}
+.fs11{font-size:11px}
+.fs12{font-size:12px}
+.fs13{font-size:13px}
+.fs14{font-size:14px}
+.fs18{font-size:18px}
+.fs20{font-size:20px}
+.lh16{line-height:1.6}
+.col-dim{color:#64748b}
+.col-muted{color:#94a3b8}
+.col-text{color:#e2e8f0}
+.ls2{letter-spacing:2px}
+.ls3{letter-spacing:3px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="screen"></div>
+  <div id="nav">
+    <button class="nav-btn" onclick="goTab('home')"><span class="nav-icon">🏠</span><span class="nav-label" id="nl-home" style="color:#334155">HOME</span></button>
+    <button class="nav-btn" onclick="goTab('chain')"><span class="nav-icon">🔗</span><span class="nav-label" id="nl-chain" style="color:#334155">CHAIN</span></button>
+    <button class="nav-btn" onclick="goTab('rules')"><span class="nav-icon">⭐</span><span class="nav-label" id="nl-rules" style="color:#334155">RULES</span></button>
+    <button class="nav-btn" onclick="goTab('eq')"><span class="nav-icon">📊</span><span class="nav-label" id="nl-eq" style="color:#334155">EQ MAP</span></button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+const S = {
+  tab: 'home',
+  daw: 'cubase',
+  expanded: null,
+  steps: JSON.parse(localStorage.getItem('ca_steps') || '{}')
+};
+
+const DAW_META = {
+  cubase:   {label:'CUBASE 15',   color:'#f59e0b', e:'🎛️'},
+  protools: {label:'PRO TOOLS',   color:'#10b981', e:'🎚️'},
+  fl:       {label:'FL STUDIO',   color:'#f97316', e:'🎹'}
+};
+
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const CHAINS = {
+cubase:[
+{slot:1,name:'FabFilter Pro-Q 2',cat:'EQ',color:'#3b82f6',
+what:'Removes bad frequencies from your voice BEFORE anything else touches it. Like cleaning dirt off before polishing.',
+steps:[
+{n:1,do:'Click your VOCAL TRACK',where:'Left panel — the track you record on (Audio 01 or KUPI)'},
+{n:2,do:'Open the INSERTS tab in the Inspector',where:'Left side panel → click Inserts'},
+{n:3,do:'Click INSERT SLOT 1 (first empty slot)',where:'Top slot in the inserts list'},
+{n:4,do:'Type Pro-Q 2 → click it',where:'Search box that appears — press Enter or click result'},
+{n:5,do:'Double-click the very LEFT EDGE of the display',where:'Inside the plugin — far left of the frequency graph'},
+{n:6,do:'RIGHT-CLICK the dot → select LOW CUT',where:'A menu appears — choose Low Cut (NOT High Cut!)'},
+{n:7,do:'Double-click FREQ knob → type 100 → Enter',where:'FREQ knob at the bottom of the panel'}
+],
+settings:[{p:'Filter Type',v:'Low Cut'},{p:'Frequency',v:'100 Hz'},{p:'Slope',v:'12 dB/oct'}],
+why:'Your mic picks up laptop fan, room rumble, and floor vibrations — all below 100Hz. Cutting there removes that noise before your compressor can amplify it.',
+hear:'Your voice becomes cleaner and less muddy immediately',
+warn:'Do NOT select High Cut — that removes high frequencies and makes your voice sound muffled'},
+
+{slot:2,name:'Gate (Steinberg)',cat:'GATE',color:'#10b981',
+what:'Acts like an automatic mute. When you stop singing it closes and kills all noise. When you sing it opens instantly.',
+steps:[
+{n:1,do:'Click INSERT SLOT 2',where:'Second slot in your Inserts list'},
+{n:2,do:'Search Gate → click Dynamics > Gate',where:'Type Gate in the search box'},
+{n:3,do:'Sing into your mic at your NORMAL volume',where:'Your actual recording position — don\'t shout'},
+{n:4,do:'Slowly drag THRESHOLD knob to the LEFT',where:'Large dial in the plugin — start from -20dB going lower'},
+{n:5,do:'Stop when you can hear yourself clearly around -45dB',where:'The display shows the dB number'},
+{n:6,do:'Be quiet — confirm complete silence',where:'Stop singing and listen — should hear nothing at all'}
+],
+settings:[{p:'Threshold',v:'-45 dB'},{p:'Analysis',v:'RMS'}],
+why:'Without a gate your mic picks up everything between words. At -45dB it opens for your voice but stays shut for background noise.',
+hear:'Complete silence between words. Voice comes through when singing. Pure silence when you stop.',
+warn:'If your voice gets cut off — lower threshold to -50dB. If noise comes through — raise to -40dB'},
+
+{slot:3,name:'Graillon 3 / Auto-Tune',cat:'PITCH',color:'#a855f7',
+what:'Fixes your pitch while you sing AND adds that crispy texture to your afrobeats and hip hop vocals.',
+steps:[
+{n:1,do:'Click INSERT SLOT 3',where:'Third slot — MUST be between Gate and Compressor'},
+{n:2,do:'Search Graillon 3 → click it',where:'If not found, search Auto-Tune instead'},
+{n:3,do:'Click the POWER BUTTON next to CORRECTION',where:'Bottom section of Graillon — MUST be lit up (ON)'},
+{n:4,do:'Double-click SMOOTH → type 150 → Enter',where:'First knob in Correction section (in milliseconds)'},
+{n:5,do:'Double-click INERTIA → type 25 → Enter',where:'Second knob (in %)'},
+{n:6,do:'Double-click SNAP MAX → type 0.5 → Enter',where:'Fourth knob (in semitones ST)'},
+{n:7,do:'Find the REDUCE knob → set to -18 bit',where:'Top section — this is your CRISPINESS knob'},
+{n:8,do:'Set WET slider to 80% and DRY to 20%',where:'Right side vertical sliders'}
+],
+settings:[{p:'Correction',v:'ON (power button lit)'},{p:'Smooth',v:'150-200 ms'},{p:'Inertia',v:'20-30%'},{p:'Snap Max',v:'0.5 ST'},{p:'Reduce (crispiness)',v:'-18 to -20 bit'},{p:'Wet/Dry',v:'80% / 20%'}],
+why:'Smooth at 150ms corrects naturally without sounding robotic. The Reduce knob adds your unique crispy texture. Speed 0 = T-Pain robot. Speed 150ms = professional natural correction.',
+hear:'Your voice sounds in tune with a slight crispiness. Singing off-key gets corrected automatically.',
+warn:'If Correction power button is OFF — Graillon does nothing. Always check it is lit first'},
+
+{slot:4,name:'Tube Compressor',cat:'COMP',color:'#8b5cf6',
+what:'Controls volume differences in your voice. Loud parts come down. Quiet parts come up. Every word hits the same professional level.',
+steps:[
+{n:1,do:'Click INSERT SLOT 4',where:'Fourth slot — after pitch correction'},
+{n:2,do:'Search Tube Compressor → click it',where:'Dynamics folder → Tube Compressor'},
+{n:3,do:'Set INPUT to 4.0 dB',where:'Left large knob — drag right to 4.0'},
+{n:4,do:'Set ATTACK to 20ms',where:'Middle-left knob'},
+{n:5,do:'Set RELEASE to 104ms',where:'Middle-right knob'},
+{n:6,do:'Set OUTPUT to 2.0 dB',where:'Right large knob — brings volume back up'},
+{n:7,do:'Set RATIO toggle to LOW',where:'Toggle at bottom — click to switch between Low and High'},
+{n:8,do:'Set CHARACTER to 20%',where:'Bottom left knob'},
+{n:9,do:'Set MIX to 70%',where:'Bottom right knob'}
+],
+settings:[{p:'Input',v:'4.0 dB'},{p:'Attack',v:'20 ms'},{p:'Release',v:'104 ms'},{p:'Output',v:'2.0 dB'},{p:'Ratio',v:'Low'},{p:'Character',v:'20%'},{p:'Mix',v:'70%'}],
+why:'Some words come out louder naturally. Without compression your mix sounds amateur. The Tube Compressor glues everything together and the tube circuit adds warmth.',
+hear:'Your voice sounds consistent. No more sudden loud or quiet words.',
+warn:'If voice sounds pumping or breathing — reduce Character to 10% or raise Attack to 30ms'},
+
+{slot:5,name:'De-esser (Steinberg)',cat:'DE-ESS',color:'#ec4899',
+what:'Automatically tames harsh S, T, and SH sounds that sound sharp and amateur. Every professional vocal has a de-esser.',
+steps:[
+{n:1,do:'Click INSERT SLOT 5',where:'Fifth slot in your Inserts list'},
+{n:2,do:'Search De-esser → click it',where:'Dynamics folder → De-esser'},
+{n:3,do:'Turn on the HI FILTER power button',where:'Blue button next to HI FILTER at the bottom of plugin'},
+{n:4,do:'Double-click LO freq → type 6000 → Enter',where:'Left frequency knob'},
+{n:5,do:'Double-click HI freq → type 10000 → Enter',where:'Right frequency knob'},
+{n:6,do:'Set REDUCTION to 5',where:'REDUCT knob in the middle'},
+{n:7,do:'Say SSSSSSS and watch the display',where:'Red area should appear — confirms it is working'}
+],
+settings:[{p:'LO Freq',v:'6.0 kHz'},{p:'HI Freq',v:'10.0 kHz'},{p:'Reduction',v:'5.0'},{p:'Release',v:'150 ms'},{p:'Auto',v:'ON'}],
+why:'Condenser mics are very sensitive to high frequencies. Without a de-esser every S and T sound hits the listener like a knife. The 6-10kHz range is exactly where harshness lives.',
+hear:'Say super sexy song — S sounds become smooth instead of sharp and hissing',
+warn:'If voice sounds lispy — reduce REDUCTION from 5 to 3. Too much de-essing is worse than none'},
+
+{slot:6,name:'Antares Mic Mod',cat:'MIC MOD',color:'#f59e0b',
+what:'Makes your Behringer C-1 sound like a Neumann U87 Gold — a $3,000 microphone used in every major recording studio in the world.',
+steps:[
+{n:1,do:'Click INSERT SLOT 6',where:'Sixth slot in your Inserts list'},
+{n:2,do:'Search Mic Mod → click it',where:'Antares folder → Mic Mod'},
+{n:3,do:'Click SOURCE MIC dropdown on the LEFT side',where:'Left dropdown'},
+{n:4,do:'Select AKG C 3000',where:'Closest match to your Behringer C-1 — both are large diaphragm condensers'},
+{n:5,do:'Click MODELED MIC dropdown on the RIGHT side',where:'Right dropdown'},
+{n:6,do:'Select Neumann U87 GOLD',where:'Scroll the list — choose U87 Gold specifically (not plain U87)'},
+{n:7,do:'Click off under Proximity on the RIGHT side → it turns ON',where:'Right side proximity section'},
+{n:8,do:'Set Proximity INCHES to 6',where:'Right proximity knob — simulates distance from mic'},
+{n:9,do:'Set TUBE SATURATION to 20',where:'Bottom center slider'}
+],
+settings:[{p:'Source Mic',v:'AKG C 3000'},{p:'Modeled Mic',v:'Neumann U87 Gold'},{p:'Tube Saturation',v:'20'},{p:'Proximity (Modeled)',v:'6 inches — ON'},{p:'Pattern',v:'Cardioid both sides'}],
+why:'AKG C3000 is the closest match to your Behringer C-1. Mic Mod removes your mic\'s character and replaces it with the U87 Gold\'s warm expensive signature.',
+hear:'Your voice gains warmth and smoothness immediately — sounds like a completely different more expensive microphone',
+warn:'Source mic MUST be condenser type (has C in the name). Never select a dynamic mic as source'},
+
+{slot:7,name:'Magneto II',cat:'SATURATION',color:'#ef4444',
+what:'Adds vintage analog tape warmth — makes your digital recording feel like it came from an expensive 1970s studio tape machine.',
+steps:[
+{n:1,do:'Click INSERT SLOT 7',where:'Seventh slot in your Inserts list'},
+{n:2,do:'Search Magneto → click Magneto II',where:'Distortion or Saturation folder'},
+{n:3,do:'Set SATURATION knob to 20%',where:'Large knob on the left — 20% is subtle but effective'},
+{n:4,do:'Watch the OUTPUT VU meter on the right',where:'If needle goes RED — turn OUTPUT knob down immediately'},
+{n:5,do:'Set OUTPUT knob to -2.0 dB',where:'Right knob — prevents clipping'},
+{n:6,do:'Leave everything else at default',where:'Low Range 150Hz and High Range 5kHz are already correct'}
+],
+settings:[{p:'Saturation',v:'20%'},{p:'Output',v:'-2.0 dB'},{p:'Low Range',v:'150 Hz'},{p:'High Range',v:'5.00 kHz'}],
+why:'Digital recordings sound cold and sterile. Saturation adds harmonic warmth that makes vocals sound expensive. At 20% you feel it more than hear it.',
+hear:'Your voice has a slight warmth and richness. Less digital sounding.',
+warn:'If OUTPUT meter shows RED — you are clipping and distorting. Turn OUTPUT to -2dB immediately'},
+
+{slot:8,name:'StereoDelay',cat:'DELAY',color:'#06b6d4',
+what:'Creates a very subtle echo that makes your voice feel wider and deeper in the mix. You feel this more than you hear it.',
+steps:[
+{n:1,do:'Click INSERT SLOT 8',where:'Eighth slot — MUST be before reverb'},
+{n:2,do:'Search StereoDelay → click it',where:'Delay folder → StereoDelay'},
+{n:3,do:'Change DELAY 1 time to 1/8',where:'Left center knob — drag until it shows 1/8'},
+{n:4,do:'Change DELAY 2 time to 1/8',where:'Right center knob — same setting'},
+{n:5,do:'Set both FEEDBACK knobs to 10%',where:'Small left knobs on each delay section'},
+{n:6,do:'Turn both MIX knobs almost fully to DRY side',where:'Leave only 10% wet — MIX knobs on right of each section'}
+],
+settings:[{p:'Delay 1 & 2',v:'1/8 note'},{p:'Feedback',v:'10%'},{p:'Mix',v:'10% wet only'}],
+why:'The 1/8 note delay locks to your beat tempo. At 10% mix you feel depth and space without hearing obvious echoes. Delay must always come before reverb.',
+hear:'Your voice feels bigger and has subtle depth. If you hear clear echoes — mix is too high.',
+warn:'If voice is echoing clearly and repeating — reduce MIX to 5%. Delay must be almost invisible'},
+
+{slot:9,name:'REVelation',cat:'REVERB',color:'#6366f1',
+what:'THE LAST PLUGIN ALWAYS. Adds professional studio room sound around your voice. Always the final step in the chain.',
+steps:[
+{n:1,do:'Click INSERT SLOT 9',where:'Ninth and final slot'},
+{n:2,do:'Search REVelation → click it',where:'Reverb folder → REVelation'},
+{n:3,do:'Click EARLY REFLECTION MODEL dropdown',where:'Middle display — currently says Hall'},
+{n:4,do:'Select STUDIO',where:'NOT Hall, NOT Whole Chamber — Studio only'},
+{n:5,do:'Find MIX slider on the FAR RIGHT edge',where:'Vertical slider on the right side of the plugin'},
+{n:6,do:'Set MIX to 15-20%',where:'Drag slider down — most beginners set this way too high'},
+{n:7,do:'Find PRE DELAY slider on the LEFT',where:'Vertical slider — set to 20ms'},
+{n:8,do:'Find MAIN TIME knob at the bottom',where:'Under TAIL section — set to 30-35%'}
+],
+settings:[{p:'Early Reflection',v:'Studio'},{p:'Mix',v:'15-20% MAX'},{p:'Pre Delay',v:'20 ms'},{p:'Main Time',v:'30-35%'}],
+why:'Studio room is tight and professional — not the large washy sound of Hall. 20ms pre-delay separates your voice from the reverb tail so both are heard clearly.',
+hear:'Your voice sounds like it was recorded in a real studio. Warm professional room sound.',
+warn:'Most beginners set reverb to 50-80% — this ruins the mix. If anyone can clearly hear the reverb, it is too loud. Stay under 20%'}
+],
+
+protools:[
+{slot:1,name:'EQ III (Built-in Free)',cat:'EQ',color:'#3b82f6',
+what:'Pro Tools built-in EQ — free and always installed. Removes bad frequencies from your voice before anything else.',
+steps:[
+{n:1,do:'Click your VOCAL TRACK to select it',where:'Click the track name in the Edit or Mix window'},
+{n:2,do:'Click an empty INSERT slot A through E',where:'Inserts section at the top of your channel strip in Mix window'},
+{n:3,do:'Go to Multichannel plug-in > EQ > EQ III 4-Band',where:'Dropdown menu that appears after clicking the insert slot'},
+{n:4,do:'Click the HP button (High Pass)',where:'Top left of the EQ III plugin — button labeled HP'},
+{n:5,do:'Drag HP FREQ knob to 100Hz',where:'Knob next to the HP button'},
+{n:6,do:'Click Band 2 dot and drag to 250Hz → pull DOWN to -3dB',where:'Middle frequency area of the graph'},
+{n:7,do:'Click Band 3 dot and drag to 4000Hz → pull UP to +2dB',where:'Upper frequency area of the graph'}
+],
+settings:[{p:'High Pass (HP)',v:'100 Hz ON'},{p:'Band 2 cut',v:'250 Hz / -3 dB / Bell'},{p:'Band 3 boost',v:'4 kHz / +2 dB / Bell'}],
+why:'Same principle as Cubase — removes laptop fan and room rumble below 100Hz, cuts boxiness at 250Hz, adds presence at 4kHz.',
+hear:'Cleaner, less muddy voice. Toggle HP button on and off to hear the difference clearly.',
+warn:'If voice sounds hollow or thin — raise HP from 100Hz to 80Hz'},
+
+{slot:2,name:'Gate/Expander (Built-in Free)',cat:'GATE',color:'#10b981',
+what:'Pro Tools built-in gate. Kills background noise between your vocal phrases automatically.',
+steps:[
+{n:1,do:'Click INSERT SLOT B (second slot)',where:'Inserts section in Mix window — slot B'},
+{n:2,do:'Go to Multichannel plug-in > Dynamics > Gate/Expander',where:'Dropdown after clicking the insert slot'},
+{n:3,do:'Set THRESHOLD to -45 dB',where:'Large knob on the left side — drag left to -45'},
+{n:4,do:'Set RANGE to -80 dB',where:'Range knob — controls how much it mutes when closed'},
+{n:5,do:'Set ATTACK to 1ms',where:'Attack knob — how fast the gate opens when you sing'},
+{n:6,do:'Set RELEASE to 150ms',where:'Release knob — how fast it closes after you stop singing'},
+{n:7,do:'Sing then stop — confirm complete silence when you stop',where:'Listen carefully for the gate closing'}
+],
+settings:[{p:'Threshold',v:'-45 dB'},{p:'Range',v:'-80 dB'},{p:'Attack',v:'1 ms'},{p:'Release',v:'150 ms'}],
+why:'Works identically to the Cubase gate. Closes automatically when you stop singing and kills all noise completely.',
+hear:'Silence between your words. Voice comes through clearly when singing.',
+warn:'If voice gets cut off at start of words — reduce Attack to 0.5ms or lower the threshold slightly'},
+
+{slot:3,name:'Auto-Tune / Graillon 3 (Same VST)',cat:'PITCH',color:'#a855f7',
+what:'GOOD NEWS — Graillon 3 and Auto-Tune work in Pro Tools exactly the same as Cubase. Same plugin, same settings.',
+steps:[
+{n:1,do:'Click INSERT SLOT C (third slot)',where:'Inserts section — slot C'},
+{n:2,do:'Go to Multichannel plug-in > Other > Graillon 3',where:'Or search in the plug-in menu'},
+{n:3,do:'Click the POWER BUTTON next to CORRECTION',where:'Must be lit up — ON'},
+{n:4,do:'Set SMOOTH to 150ms',where:'First knob in Correction section'},
+{n:5,do:'Set SNAP MAX to 0.5 ST',where:'Fourth knob'},
+{n:6,do:'Set REDUCE to -18 bit',where:'Top section — crispiness knob'},
+{n:7,do:'Set WET to 80% and DRY to 20%',where:'Right side sliders'}
+],
+settings:[{p:'Correction',v:'ON'},{p:'Smooth',v:'150-200 ms'},{p:'Snap Max',v:'0.5 ST'},{p:'Reduce',v:'-18 bit'},{p:'Wet/Dry',v:'80/20%'}],
+why:'VST plugins like Graillon 3 work across all DAWs. The same plugin, the same settings, the same crispy result.',
+hear:'Your voice sounds in tune with that crispy afrobeats texture',
+warn:'Correction MUST be turned ON. Check the power button is lit or it does nothing at all'},
+
+{slot:4,name:'Dyn3 Compressor/Limiter (Built-in)',cat:'COMP',color:'#8b5cf6',
+what:'Pro Tools professional built-in compressor. Controls your vocal dynamics so every word hits at the same level.',
+steps:[
+{n:1,do:'Click INSERT SLOT D (fourth slot)',where:'Inserts section — slot D'},
+{n:2,do:'Go to Multichannel plug-in > Dynamics > Dyn3 Compressor/Limiter',where:'Dropdown menu'},
+{n:3,do:'Set RATIO to 3:1',where:'Ratio knob — drag to 3:1'},
+{n:4,do:'Set ATTACK to 20ms',where:'Attack knob'},
+{n:5,do:'Set RELEASE to 100ms',where:'Release knob'},
+{n:6,do:'Set THRESHOLD to -20dB',where:'Large threshold dial — drag left to -20'},
+{n:7,do:'Set KNEE to SOFT',where:'Knee button — click until it shows Soft'},
+{n:8,do:'Set GAIN makeup to +4dB',where:'Output gain knob — brings level back up after compression'}
+],
+settings:[{p:'Ratio',v:'3:1'},{p:'Attack',v:'20 ms'},{p:'Release',v:'100 ms'},{p:'Threshold',v:'-20 dB'},{p:'Knee',v:'Soft'},{p:'Gain makeup',v:'+4 dB'}],
+why:'Soft knee makes compression more natural. Ratio 3:1 tames peaks without squashing your voice. Makeup gain brings volume back.',
+hear:'Even vocal volume. No sudden loud or quiet words. Voice sits consistently in the mix.',
+warn:'If gain reduction meter GR shows more than -8dB constantly — raise Threshold from -20dB to -15dB'},
+
+{slot:5,name:'De-Esser (Built-in Pro Tools)',cat:'DE-ESS',color:'#ec4899',
+what:'Pro Tools built-in de-esser. Tames harsh S and T sounds professionally. Free and always installed.',
+steps:[
+{n:1,do:'Click INSERT SLOT E (fifth slot)',where:'Inserts section — slot E'},
+{n:2,do:'Go to Multichannel plug-in > Dynamics > De-Esser',where:'Dropdown menu'},
+{n:3,do:'Set FREQUENCY to 7500 Hz (7.5 kHz)',where:'Frequency knob — the target of de-essing'},
+{n:4,do:'Set RANGE to -6 dB',where:'Range knob — how much it reduces the S sounds'},
+{n:5,do:'Make sure HIGH FREQ ONLY is enabled',where:'Checkbox or button at the top of the plugin'},
+{n:6,do:'Say SSSSSSS — watch the gain reduction meter move',where:'The meter should respond to your S sounds'}
+],
+settings:[{p:'Frequency',v:'7.5 kHz'},{p:'Range',v:'-6 dB'},{p:'High Freq Only',v:'ON'}],
+why:'High Freq Only mode means it only processes the target frequency — not your whole vocal. Keeps your voice natural while taming harshness.',
+hear:'Say super sexy song — S sounds become smooth instead of sharp',
+warn:'If voice sounds lispy — reduce Range from -6dB to -3dB. Start subtle and increase carefully'},
+
+{slot:6,name:'Antares Mic Mod (Same Plugin)',cat:'MIC MOD',color:'#f59e0b',
+what:'SAME PLUGIN as Cubase. Antares Mic Mod works across all DAWs. Exact same settings and same result.',
+steps:[
+{n:1,do:'Click next available INSERT SLOT',where:'If A-E are full — click on the second row of inserts'},
+{n:2,do:'Go to Multichannel plug-in > Other > Antares Mic Mod',where:'Or search Mic Mod'},
+{n:3,do:'Set SOURCE MIC to AKG C 3000',where:'Left dropdown'},
+{n:4,do:'Set MODELED MIC to Neumann U87 Gold',where:'Right dropdown'},
+{n:5,do:'Turn ON Proximity on the RIGHT side → set to 6 inches',where:'Click off text on right side'},
+{n:6,do:'Set TUBE SATURATION to 20',where:'Bottom center slider'}
+],
+settings:[{p:'Source Mic',v:'AKG C 3000'},{p:'Modeled Mic',v:'Neumann U87 Gold'},{p:'Tube Saturation',v:'20'},{p:'Proximity',v:'6 inches ON'}],
+why:'Works exactly the same in Pro Tools as Cubase. Same transformation — your voice sounds like a $3,000 microphone.',
+hear:'Warmth and smoothness added to your voice immediately',
+warn:'Source mic MUST be condenser type. Dynamic mics will sound completely wrong as the source'},
+
+{slot:7,name:'Lo-Fi (Subtle Saturation)',cat:'SAT',color:'#ef4444',
+what:'Pro Tools Lo-Fi plugin used VERY SUBTLY adds analog warmth. Set bit depth to 24-bit for almost invisible warmth.',
+steps:[
+{n:1,do:'Click next INSERT SLOT',where:'Next available slot in inserts'},
+{n:2,do:'Go to Multichannel plug-in > Harmonic > Lo-Fi',where:'Or Other folder'},
+{n:3,do:'Set BIT RESOLUTION to 24 bit',where:'Left section — highest quality setting keeps it subtle'},
+{n:4,do:'Set SAMPLE RATE CONVERSION to OFF',where:'Middle section'},
+{n:5,do:'Leave INPUT and OUTPUT at 0dB',where:'Left and right sliders'},
+{n:6,do:'Alternative: Download Avid Saturation Knob for free',where:'Search Avid Saturation Knob — it is free and much simpler to use'}
+],
+settings:[{p:'Bit Resolution',v:'24-bit'},{p:'Sample Rate Conv',v:'OFF'},{p:'Mix',v:'Subtle — 20-30%'}],
+why:'Lo-Fi at 24-bit gives very subtle harmonic saturation. The warmth it adds is similar to Magneto II in Cubase.',
+hear:'Very subtle warmth added. Less digital and cold sounding.',
+warn:'Do NOT lower bit resolution below 20-bit — it will sound obviously degraded and low quality'},
+
+{slot:8,name:'Mod Delay III (Built-in Free)',cat:'DELAY',color:'#06b6d4',
+what:'Pro Tools built-in delay. Creates subtle depth and width. Free and always available in Pro Tools.',
+steps:[
+{n:1,do:'Click next INSERT SLOT',where:'Next available slot — MUST be before reverb'},
+{n:2,do:'Go to Multichannel plug-in > Delay > Mod Delay III',where:'Delay folder'},
+{n:3,do:'Enable TEMPO SYNC button',where:'Small sync button — click until it is highlighted'},
+{n:4,do:'Set DELAY TIME to 1/8 note',where:'With sync enabled — select 1/8 from the note value dropdown'},
+{n:5,do:'Set FEEDBACK to 20%',where:'Feedback knob'},
+{n:6,do:'Set MIX to 15%',where:'Mix knob — keep subtle'},
+{n:7,do:'Set MODULATION DEPTH to 0',where:'Mod section — leave at zero for clean delay'}
+],
+settings:[{p:'Sync',v:'Tempo sync ON'},{p:'Delay',v:'1/8 note'},{p:'Feedback',v:'20%'},{p:'Mix',v:'15%'},{p:'Mod Depth',v:'0'}],
+why:'Tempo synced delay locks to your beat automatically. At 15% mix it adds depth that you feel rather than hear as obvious echo.',
+hear:'Your voice feels wider and deeper. Subtle — if you hear clear echoes the mix is too high.',
+warn:'If voice echoes noticeably — reduce Mix to 8-10%. Delay must be almost invisible in the mix'},
+
+{slot:9,name:'D-Verb (Built-in Free)',cat:'REVERB',color:'#6366f1',
+what:'Pro Tools classic built-in reverb. Professional studio room sound. Free and always available.',
+steps:[
+{n:1,do:'Click LAST INSERT SLOT',where:'Final slot — reverb is ALWAYS the last plugin'},
+{n:2,do:'Go to Multichannel plug-in > Reverb > D-Verb',where:'Reverb folder'},
+{n:3,do:'Set ALGORITHM to Room',where:'Top dropdown — choose Room (not Hall or Church)'},
+{n:4,do:'Set SIZE to Medium',where:'Size knob or dropdown'},
+{n:5,do:'Set DIFFUSION to 75%',where:'Diffusion knob'},
+{n:6,do:'Set DECAY to 1.2 seconds',where:'Decay knob'},
+{n:7,do:'Set PRE-DELAY to 20ms',where:'Pre-delay knob'},
+{n:8,do:'Set MIX to 15-20%',where:'Mix knob — this is the most important setting to get right'}
+],
+settings:[{p:'Algorithm',v:'Room'},{p:'Size',v:'Medium'},{p:'Diffusion',v:'75%'},{p:'Decay',v:'1.2 s'},{p:'Pre-Delay',v:'20 ms'},{p:'Mix',v:'15-20% MAX'}],
+why:'Room algorithm gives tight professional space. 1.2s decay matches a real recording studio. 20ms pre-delay separates voice from reverb so both stay clear.',
+hear:'Your voice sounds like it was recorded in a professional studio room.',
+warn:'Most beginners set mix to 50% or higher — this drowns the vocals. Stay under 20% always'}
+],
+
+fl:[
+{slot:1,name:'Parametric EQ 2 (Built-in Free)',cat:'EQ',color:'#3b82f6',
+what:'FL Studio built-in EQ — completely free and powerful. Removes bad frequencies from your voice before anything else.',
+steps:[
+{n:1,do:'Press F9 to open the MIXER',where:'Press F9 on keyboard or click Mixer button at top of FL Studio'},
+{n:2,do:'Click the VOCAL CHANNEL in the Mixer',where:'The channel your vocal is routed to'},
+{n:3,do:'Click an empty SLOT in the Effects section on the right side',where:'Right side of the Mixer channel — effects chain slots'},
+{n:4,do:'Select Fruity Parametric EQ 2',where:'From the effects list that appears'},
+{n:5,do:'Click Band 1 dot and RIGHT-CLICK → select High Pass',where:'Turns it into a proper high pass filter'},
+{n:6,do:'Set Band 1 frequency to 100Hz',where:'Type 100 in the frequency box or drag carefully'},
+{n:7,do:'Double-click at 250Hz to add new band → drag DOWN to -3dB',where:'Creates a cut at 250Hz for boxiness'},
+{n:8,do:'Double-click at 4000Hz to add new band → drag UP to +2dB',where:'Creates a boost at 4kHz for presence'}
+],
+settings:[{p:'Band 1 HP',v:'100 Hz High Pass'},{p:'Band 2 cut',v:'250 Hz / -3 dB'},{p:'Band 3 boost',v:'4 kHz / +2 dB'}],
+why:'Same principle across all DAWs — removes laptop fan and room rumble below 100Hz, cuts boxiness at 250Hz, adds presence at 4kHz.',
+hear:'Voice becomes cleaner and clearer. Toggle band 1 on/off to hear the difference.',
+warn:'If voice sounds thin or hollow — try 80Hz instead of 100Hz for the high pass'},
+
+{slot:2,name:'Couture (Free Gate) or Fruity Compressor trick',cat:'GATE',color:'#10b981',
+what:'FL Studio has no dedicated gate built-in. We use Couture (free plugin by Auburn Sounds — same makers as Graillon 3) OR the compressor trick.',
+steps:[
+{n:1,do:'OPTION A — Download Couture (RECOMMENDED)',where:'Go to auburn-sounds.com and download Couture for free then install it'},
+{n:2,do:'In Mixer effects → click empty slot → Couture',where:'Couture appears as a VST after installing'},
+{n:3,do:'In Couture click the GATE section',where:'Middle section of the plugin — click Gate tab'},
+{n:4,do:'Set THRESHOLD to -45dB',where:'Threshold slider in the Gate section'},
+{n:5,do:'Set ATTACK to 1ms and RELEASE to 150ms',where:'Attack and Release sliders'},
+{n:6,do:'OPTION B — Fruity Compressor with extreme ratio as gate',where:'Ratio 100:1, Threshold -40dB, Attack 0ms, Release 150ms'}
+],
+settings:[{p:'Plugin',v:'Couture (free) or Fruity Compressor'},{p:'Threshold',v:'-45 dB'},{p:'Attack',v:'1 ms'},{p:'Release',v:'150 ms'}],
+why:'Couture by Auburn Sounds (makers of Graillon 3) is completely free and has a dedicated gate section. It works exactly like the Steinberg Gate in Cubase.',
+hear:'Silence between words. Voice comes through clearly when singing.',
+warn:'If Couture is not available — the Fruity Compressor trick at extreme ratio is less precise but works as a starting point'},
+
+{slot:3,name:'Pitcher (Built-in) or Graillon 3',cat:'PITCH',color:'#a855f7',
+what:'FL Studio has Pitcher built-in for free — OR use Graillon 3 which is the same plugin you already have. Both work great.',
+steps:[
+{n:1,do:'OPTION A — Use Graillon 3 (recommended — you already have it)',where:'Same plugin, same settings as Cubase'},
+{n:2,do:'Mixer effects → click empty slot → Graillon 3',where:'It appears in your VST list'},
+{n:3,do:'Turn ON CORRECTION power button',where:'Bottom section — MUST be lit up'},
+{n:4,do:'Set SMOOTH to 150ms, SNAP MAX to 0.5ST, REDUCE to -18 bit',where:'Same exact settings as Cubase'},
+{n:5,do:'OPTION B — Use Pitcher (built-in free)',where:'Mixer effects → Fruity Pitcher'},
+{n:6,do:'In Pitcher enable the CORRECTION checkbox',where:'Main switch in Pitcher interface'},
+{n:7,do:'Set KEY to your song key',where:'Key dropdown in Pitcher'},
+{n:8,do:'Set SPEED to 33%',where:'Speed or Retune knob — 33% is natural sounding'}
+],
+settings:[{p:'Recommended',v:'Graillon 3 (crispy)'},{p:'Alternative',v:'Pitcher (clean)'},{p:'Graillon Smooth',v:'150ms'},{p:'Pitcher Speed',v:'33%'},{p:'Key',v:'Your song key'}],
+why:'Graillon 3 gives you the crispiness effect AND pitch correction. Pitcher gives clean correction without the crispiness. Choose based on the sound you want.',
+hear:'Graillon: in-tune voice with crispy texture. Pitcher: clean in-tune voice without texture.',
+warn:'If using Pitcher — low Speed = more correction = more robotic. High Speed = less correction. Find your sweet spot around 33%'},
+
+{slot:4,name:'Fruity Compressor (Built-in Free)',cat:'COMP',color:'#8b5cf6',
+what:'FL Studio built-in compressor. Controls your vocal volume so every word hits at the same level. Free and powerful.',
+steps:[
+{n:1,do:'Mixer effects → click empty slot → Fruity Compressor',where:'Effects chain in the Mixer'},
+{n:2,do:'Set RATIO to 3:1',where:'Ratio knob on the right side'},
+{n:3,do:'Set ATTACK to 20ms',where:'Attack knob'},
+{n:4,do:'Set RELEASE to 100ms',where:'Release knob'},
+{n:5,do:'Sing into your mic and watch the GAIN REDUCTION meter move',where:'The GR meter moves when compressor is working'},
+{n:6,do:'Drag THRESHOLD left until GR meter shows 4-8dB of reduction',where:'Lower it slowly until you see consistent GR movement'},
+{n:7,do:'Raise GAIN to compensate for volume lost from compression',where:'Turn up until output volume matches input volume'}
+],
+settings:[{p:'Ratio',v:'3:1'},{p:'Attack',v:'20 ms'},{p:'Release',v:'100 ms'},{p:'Threshold',v:'Set by ear — aim for -4 to -8dB GR'},{p:'Gain',v:'Makeup to compensate'}],
+why:'Setting threshold by watching the GR meter as you sing is more accurate than guessing a specific dB number. Aim for 4-8dB of gain reduction.',
+hear:'Even vocal volume. No more sudden loud or quiet words.',
+warn:'If GR meter always shows more than -12dB — threshold is too low. Raise it until GR shows a maximum of -8dB'},
+
+{slot:5,name:'Lisp (Free De-esser) or EQ Cut',cat:'DE-ESS',color:'#ec4899',
+what:'FL Studio has no built-in de-esser. Download Lisp (free de-esser) OR use a static EQ cut as a starting point.',
+steps:[
+{n:1,do:'OPTION A — Download Lisp (RECOMMENDED FREE)',where:'Go to sleepytimedsp.com and download Lisp VST for free then install'},
+{n:2,do:'Mixer effects → click empty slot → Lisp',where:'Appears after installing in your VST list'},
+{n:3,do:'Set FREQUENCY to 7000 Hz (7kHz)',where:'Frequency knob in Lisp'},
+{n:4,do:'Lower THRESHOLD until S sounds are tamed',where:'Lower threshold slowly until de-essing kicks in on S sounds'},
+{n:5,do:'OPTION B — Add second Parametric EQ 2 to the chain',where:'Add new EQ instance specifically for de-essing'},
+{n:6,do:'Add a narrow BELL cut at 7500Hz around -4dB',where:'Double-click at 7500Hz on the graph → drag down to -4dB'},
+{n:7,do:'Say SSSSS — this reduces S sounds even without a dedicated plugin',where:'Static cut — always on but better than nothing'}
+],
+settings:[{p:'Plugin',v:'Lisp (free) or EQ bell cut'},{p:'Frequency',v:'7-8 kHz'},{p:'Reduction',v:'-3 to -6 dB'}],
+why:'Lisp is specifically designed for de-essing and completely free. The EQ cut method always cuts even when you are not making S sounds — Lisp is dynamic and much smarter.',
+hear:'S and T sounds become less harsh and piercing. Voice stays natural.',
+warn:'The static EQ cut always reduces at that frequency. Download Lisp for a proper dynamic de-esser that only activates on S sounds'},
+
+{slot:6,name:'Antares Mic Mod (Same Plugin)',cat:'MIC MOD',color:'#f59e0b',
+what:'SAME PLUGIN as Cubase. Works identically in FL Studio. Same settings, same transformation, same result.',
+steps:[
+{n:1,do:'Mixer effects → click empty slot → Antares Mic Mod',where:'VST plugins section in the Mixer'},
+{n:2,do:'Set SOURCE MIC to AKG C 3000',where:'Left dropdown'},
+{n:3,do:'Set MODELED MIC to Neumann U87 Gold',where:'Right dropdown'},
+{n:4,do:'Turn ON Proximity on the RIGHT side → set to 6 inches',where:'Click off text on right side to enable'},
+{n:5,do:'Set TUBE SATURATION to 20',where:'Bottom center slider'}
+],
+settings:[{p:'Source Mic',v:'AKG C 3000'},{p:'Modeled Mic',v:'Neumann U87 Gold'},{p:'Tube Saturation',v:'20'},{p:'Proximity',v:'6 inches ON'}],
+why:'Antares Mic Mod is a VST plugin that works the same in every DAW. Same transformation — Behringer C-1 sounds like a Neumann U87 Gold.',
+hear:'Your voice immediately gains warmth and smoothness in FL Studio too',
+warn:'Make sure Antares Mic Mod is installed in your FL Studio VST plugin folder so it appears in the list'},
+
+{slot:7,name:'Fruity Blood Overdrive (Saturation)',cat:'SAT',color:'#ef4444',
+what:'FL Studio overdrive plugin used VERY SUBTLY to add analog warmth. Keep settings extremely low for vocals.',
+steps:[
+{n:1,do:'Mixer effects → click empty slot → Fruity Blood Overdrive',where:'Effects list in Mixer'},
+{n:2,do:'Set PRE-BAND knob very LOW around 10%',where:'Left knob — this drives the saturation amount'},
+{n:3,do:'Set COLOR to somewhere in the middle',where:'Middle knob — affects the warmth character'},
+{n:4,do:'Set POST GAIN to keep volume consistent',where:'Right knob — adjust to match input level'},
+{n:5,do:'Alternative: Use Fruity WaveShaper for softer saturation',where:'Effects list → Fruity WaveShaper → preset Soft Clip'}
+],
+settings:[{p:'Pre-Band',v:'Very Low — 10%'},{p:'Color',v:'Middle position'},{p:'Post Gain',v:'Adjust to match level'}],
+why:'At very low Pre-Band settings Blood Overdrive adds gentle harmonic saturation similar to Magneto II in Cubase. The key is keeping it subtle — less than you think.',
+hear:'Slight warmth added. Less digital and cold sounding.',
+warn:'Blood Overdrive is aggressive at higher settings. Keep Pre-Band below 15% for vocals or it will sound distorted'},
+
+{slot:8,name:'Fruity Delay 3 (Built-in Free)',cat:'DELAY',color:'#06b6d4',
+what:'FL Studio built-in delay. Adds subtle depth and width to your voice. Free and always available.',
+steps:[
+{n:1,do:'Mixer effects → click empty slot → Fruity Delay 3',where:'Effects list — MUST be before reverb'},
+{n:2,do:'Enable TEMPO SYNC (the musical note icon button)',where:'Click the sync button so delay locks to your beat tempo'},
+{n:3,do:'Set DELAY TIME to 1/8 note',where:'With sync on — click the note value and choose 1/8'},
+{n:4,do:'Set FEEDBACK to 20%',where:'Feedback knob — how many times it repeats'},
+{n:5,do:'Set WET knob to 15%',where:'Wet/dry knob — keep mostly dry side'}
+],
+settings:[{p:'Tempo Sync',v:'ON'},{p:'Delay Time',v:'1/8 note'},{p:'Feedback',v:'20%'},{p:'Wet',v:'15%'}],
+why:'Tempo sync locks the delay to your beat BPM automatically. At 15% wet you feel the depth without hearing obvious echoes.',
+hear:'Voice feels wider and deeper. If you hear clear echoes — wet is too high.',
+warn:'If voice echoes clearly — lower Wet to 8-10%. The delay must be felt not heard clearly'},
+
+{slot:9,name:'Fruity Reverb 2 (Built-in Free)',cat:'REVERB',color:'#6366f1',
+what:'FL Studio built-in reverb. Adds professional studio room sound. Always the LAST plugin in the chain.',
+steps:[
+{n:1,do:'Mixer effects → click LAST empty slot → Fruity Reverb 2',where:'MUST be the final effect in the chain'},
+{n:2,do:'Set ROOM SIZE to medium-small around 40-50%',where:'Room Size knob'},
+{n:3,do:'Set DECAY TIME to 1.2 seconds',where:'Decay knob'},
+{n:4,do:'Set HIGH DAMPING to 50%',where:'High Damping knob — tames harsh high frequencies in the reverb'},
+{n:5,do:'Set PRE-DELAY to 20ms',where:'Pre-Delay knob'},
+{n:6,do:'Set DRY to 80% and WET to 20%',where:'Bottom section — Dry and Wet level knobs'},
+{n:7,do:'Sing a long note and listen to the reverb tail',where:'Should fade naturally in about 1-1.5 seconds'}
+],
+settings:[{p:'Room Size',v:'40-50%'},{p:'Decay',v:'1.2 seconds'},{p:'High Damping',v:'50%'},{p:'Pre-Delay',v:'20 ms'},{p:'Dry/Wet',v:'80% / 20%'}],
+why:'High Damping makes the reverb sound less harsh and more natural. Small-medium room size keeps it tight and professional rather than washy and airy.',
+hear:'Your voice sounds like it was recorded in a real studio room. Warm space around the voice.',
+warn:'Wet above 25% will make your vocals sound far away and drowning in reverb. Stay at 20% maximum'}
+]
+};
+
+const GOLDEN_RULES=[
+{i:'📊',r:'High Pass at 100Hz ALWAYS',w:'Removes mic rumble and laptop fan noise below 100Hz'},
+{i:'🚪',r:'Gate BEFORE Compressor',w:'Remove noise before compression amplifies it'},
+{i:'🎵',r:'Pitch correction BEFORE Compressor',w:'Fix pitch on the raw voice — not the compressed one'},
+{i:'↩️',r:'Delay BEFORE Reverb ALWAYS',w:'The delay echo must sit INSIDE the reverb tail'},
+{i:'🌊',r:'Reverb Mix 15-20% MAXIMUM',w:'Pros feel reverb — they do not hear it clearly'},
+{i:'🎙️',r:'Mic at 6-8 inches distance',w:'Closer = too much bass. Further = thin voice'},
+{i:'⚡',r:'48V Phantom Power MUST be ON',w:'Your C-1 condenser mic cannot work without it'},
+{i:'💻',r:'ASIO Buffer 512 + Offset 3ms',w:'This exact setting removes all crackling on your setup'},
+{i:'🎚️',r:'Record at -18dB to -12dB',w:'Loud enough to capture but not so loud it distorts'}
+];
+
+const EQ_MAP=[
+{f:'Below 100Hz',a:'CUT',c:'#ef4444',r:'Rumble, fan noise',w:'Cannot hear this but it muddies everything above it'},
+{f:'200–300Hz',a:'CUT -3dB',c:'#f97316',r:'Boxy muddy tone',w:'Makes voice sound like singing inside a cardboard box'},
+{f:'1–2kHz',a:'CUT if harsh',c:'#eab308',r:'Nasal quality',w:'The honky annoying zone — cut if voice sounds harsh or nasal'},
+{f:'3–5kHz',a:'BOOST +2dB',c:'#10b981',r:'Presence and clarity',w:'Makes your voice cut through the beat and be heard clearly'},
+{f:'10–12kHz',a:'BOOST +1.5dB',c:'#6366f1',r:'Air and crispness',w:'That bright airy quality you hear on professional vocal recordings'}
+];
+
+// ═══════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════
+function saveSteps(){localStorage.setItem('ca_steps',JSON.stringify(S.steps));}
+
+function toggleStep(slot,n){
+  const k=`${S.daw}-${slot}-${n}`;
+  S.steps[k]=!S.steps[k];
+  saveSteps();
+  render();
+}
+
+function stepDone(slot,n){return !!S.steps[`${S.daw}-${slot}-${n}`];}
+function doneCount(slot){return CHAINS[S.daw].find(p=>p.slot===slot)?.steps.filter(s=>stepDone(slot,s.n)).length||0;}
+function totalCount(slot){return CHAINS[S.daw].find(p=>p.slot===slot)?.steps.length||0;}
+
+function setDaw(d){S.daw=d;S.expanded=null;render();}
+function goTab(t){S.tab=t;S.expanded=null;render();}
+function toggleExpand(i){S.expanded=S.expanded===i?null:i;render();}
+
+function dawBar(){
+  return `<div class="daw-tabs" style="padding-left:0;padding-right:0;">
+    ${Object.entries(DAW_META).map(([id,m])=>`
+    <button class="daw-tab" onclick="setDaw('${id}')" style="border-color:${S.daw===id?m.color:'#1e293b'};background:${S.daw===id?m.color+'18':'#0f172a'};color:${S.daw===id?m.color:'#475569'}">
+      ${m.e} ${m.label}
+    </button>`).join('')}
+  </div>`;
+}
+
+function renderHome(){
+  const m=DAW_META[S.daw];
+  return `<div class="pad">
+    <div class="flex items-center gap8" style="margin-bottom:22px;padding-top:6px;">
+      <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#f59e0b55);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 24px #f59e0b40;flex-shrink:0">☁️</div>
+      <div>
+        <div style="font-size:9px;color:#f59e0b;letter-spacing:5px;font-weight:900;font-family:'Rajdhani',sans-serif">CLOUDY AI</div>
+        <div style="font-size:19px;font-weight:900;color:#e2e8f0;letter-spacing:1px">STUDIO GUIDE</div>
+        <div style="font-size:11px;color:#64748b">Step-by-step for Cubase, Pro Tools & FL Studio</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:#64748b;font-weight:800;letter-spacing:2px;margin-bottom:10px">SELECT YOUR DAW</div>
+      ${dawBar()}
+    </div>
+
+    <div class="hero" style="background:linear-gradient(135deg,${m.color}15,#0f172a);border-color:${m.color}40">
+      <div style="font-size:32px;margin-bottom:8px">${m.e}</div>
+      <div style="font-size:17px;font-weight:900;color:${m.color};letter-spacing:2px;margin-bottom:4px">${m.label}</div>
+      <div style="font-size:12px;color:#64748b">9 plugins · All with exact step-by-step instructions</div>
+    </div>
+
+    <div class="hero" style="background:linear-gradient(135deg,#f59e0b15,#0f172a);border-color:#f59e0b40">
+      <div style="font-size:13px;color:#f59e0b;font-weight:800;margin-bottom:12px;letter-spacing:1px">📱 HOW TO USE THIS APP</div>
+      ${[['1','Select your DAW above','Cubase, Pro Tools, or FL Studio'],['2','Go to CHAIN tab','Opens your 9-plugin setup guide'],['3','Tap any plugin card','See exact steps with WHERE to click'],['4','Tick off steps as you do them','Tracks your progress through setup']].map(([n,t,s])=>`
+      <div class="flex items-start gap8" style="margin-bottom:10px">
+        <div style="width:26px;height:26px;border-radius:8px;background:#f59e0b20;border:1.5px solid #f59e0b50;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#f59e0b;flex-shrink:0">${n}</div>
+        <div><div style="font-size:13px;font-weight:800;color:#e2e8f0">${t}</div><div style="font-size:11px;color:#64748b">${s}</div></div>
+      </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <div style="font-size:12px;font-weight:800;color:#64748b;letter-spacing:2px;margin-bottom:14px">🎙️ YOUR SETUP</div>
+      ${[['Mic','Behringer C-1','#e2e8f0'],['Sound Card','Behringer USB Audio','#e2e8f0'],['Driver','ASIO4ALL v2.16','#10b981'],['Buffer Size','512 samples','#10b981'],['Buffer Offset','3ms ← your magic number','#10b981'],['Phantom Power','48V — MUST BE ON ⚠️','#f59e0b'],['Mic Distance','6–8 inches','#f59e0b'],['Preset Name','Cloudy AI','#a855f7']].map(([l,v,c])=>`
+      <div class="setting-row"><span class="setting-key">${l}</span><span class="setting-val" style="color:${c}">${v}</span></div>`).join('')}
+    </div>
+
+    <button onclick="goTab('chain')" style="width:100%;background:linear-gradient(135deg,${m.color}20,${m.color}10);border:1.5px solid ${m.color}60;border-radius:14px;padding:18px;color:${m.color};font-weight:900;font-size:14px;letter-spacing:2px">
+      START SETUP → OPEN CHAIN GUIDE 🔗
+    </button>
+  </div>`;
+}
+
+function renderChain(){
+  const chain=CHAINS[S.daw];
+  const m=DAW_META[S.daw];
+  return `<div class="pad">
+    <div style="margin-bottom:14px">
+      <div style="font-size:20px;font-weight:900;letter-spacing:3px;color:${m.color}">VOCAL CHAIN</div>
+      <div style="font-size:11px;color:#64748b">Tap any plugin for step-by-step instructions</div>
+    </div>
+    ${dawBar()}
+    ${chain.map((p,i)=>{
+      const isOpen=S.expanded===i;
+      const done=doneCount(p.slot);
+      const total=totalCount(p.slot);
+      const allDone=done===total;
+      return `
+      <div style="margin-bottom:10px">
+        <div onclick="toggleExpand(${i})" style="background:${isOpen?p.color+'12':'#0f172a'};border:1.5px solid ${isOpen?p.color+'55':'#1e293b'};border-radius:${isOpen?'14px 14px 0 0':'14px'};padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:${p.color}20;border:1.5px solid ${p.color}60;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:${allDone?'#10b981':p.color};flex-shrink:0">${allDone?'✓':p.slot}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:800;color:${allDone?'#10b981':'#e2e8f0'}">${p.name}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:3px">
+              <span style="font-size:9px;font-weight:800;color:${p.color};background:${p.color}18;padding:2px 7px;border-radius:4px">${p.cat}</span>
+              <span style="font-size:10px;color:#475569">${done}/${total} steps</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="progress-bar"><div class="progress-fill" style="width:${(done/total)*100}%;background:${allDone?'#10b981':p.color}"></div></div>
+            <span style="color:#334155;font-size:12px">${isOpen?'▲':'▼'}</span>
+          </div>
+        </div>
+        ${isOpen?`
+        <div style="background:${p.color}08;border:1.5px solid ${p.color}40;border-top:none;border-radius:0 0 14px 14px;padding:20px 18px">
+          <div class="box box-what" style="border-left-color:${p.color}">
+            <div class="box-label" style="color:${p.color}">WHAT THIS PLUGIN DOES</div>
+            <div class="box-text">${p.what}</div>
+          </div>
+          <div style="font-size:11px;font-weight:800;color:#64748b;letter-spacing:2px;margin-bottom:12px">FOLLOW THESE STEPS IN ${DAW_META[S.daw].label} ↓</div>
+          ${p.steps.map(step=>{
+            const isDone=stepDone(p.slot,step.n);
+            return `
+            <div onclick="toggleStep(${p.slot},${step.n})" class="step-row" style="opacity:${isDone?0.55:1}">
+              <div class="step-num" style="background:${isDone?p.color+'30':'#0f172a'};border-color:${isDone?p.color:'#334155'};color:${isDone?p.color:'#475569'}">${isDone?'✓':step.n}</div>
+              <div style="flex:1">
+                <div class="step-do" style="color:${isDone?'#64748b':'#e2e8f0'};text-decoration:${isDone?'line-through':'none'}">${step.do}</div>
+                <div class="step-where">📍 ${step.where}</div>
+              </div>
+            </div>`;
+          }).join('')}
+          <div class="card" style="margin-top:16px;margin-bottom:12px;padding:14px">
+            <div style="font-size:10px;color:#64748b;font-weight:800;letter-spacing:1.5px;margin-bottom:10px">FINAL SETTINGS</div>
+            ${p.settings.map(s=>`<div class="setting-row"><span class="setting-key">${s.p}</span><span class="setting-val" style="color:${p.color}">${s.v}</span></div>`).join('')}
+          </div>
+          <div class="box box-why">
+            <div class="box-label" style="color:#10b981">✅ WHY THIS MATTERS</div>
+            <div class="box-text">${p.why}</div>
+          </div>
+          <div class="box box-hear" style="border-color:${p.color}30">
+            <div class="box-label" style="color:${p.color}">👂 WHAT YOU SHOULD HEAR</div>
+            <div class="box-text">${p.hear}</div>
+          </div>
+          <div class="box box-warn">
+            <div class="box-label" style="color:#ef4444">⚠️ COMMON MISTAKE</div>
+            <div class="box-text">${p.warn}</div>
+          </div>
+        </div>`:''
+      }</div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderRules(){
+  return `<div class="pad">
+    <div style="font-size:20px;font-weight:900;letter-spacing:3px;color:#6366f1;margin-bottom:4px">GOLDEN RULES</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:20px">These apply to EVERY session in EVERY DAW</div>
+    ${GOLDEN_RULES.map(r=>`
+    <div class="rule-card">
+      <div class="rule-icon-box">${r.i}</div>
+      <div><div class="rule-title">${r.r}</div><div class="rule-why">${r.w}</div></div>
+    </div>`).join('')}
+    <div class="card" style="background:linear-gradient(135deg,#f59e0b15,#0f172a);border-color:#f59e0b40;margin-top:8px">
+      <div style="font-size:13px;color:#f59e0b;font-weight:800;margin-bottom:8px">🎉 YOUR SAVED PRESET</div>
+      <div style="font-size:14px;font-weight:900;color:#e2e8f0;margin-bottom:8px">Cloudy AI</div>
+      <div style="font-size:12px;color:#64748b;line-height:1.7">
+        <b style="color:#f59e0b">Cubase:</b> Inserts panel → gear ⚙️ → Load Track Preset → Cloudy AI<br><br>
+        <b style="color:#10b981">Pro Tools:</b> Plug-in Settings folder → Import Settings file<br><br>
+        <b style="color:#f97316">FL Studio:</b> Save Mixer preset → reload when starting new session
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderEQ(){
+  return `<div class="pad">
+    <div style="font-size:20px;font-weight:900;letter-spacing:3px;color:#3b82f6;margin-bottom:4px">EQ FREQUENCY MAP</div>
+    <div style="font-size:11px;color:#64748b;margin-bottom:20px">What each frequency does to your voice — works in all DAWs</div>
+    <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:24px">
+      ${['#ef4444','#f97316','#eab308','#10b981','#6366f1'].map(c=>`<div style="flex:1;background:${c}"></div>`).join('')}
+    </div>
+    ${EQ_MAP.map(e=>`
+    <div class="eq-card" style="border-left-color:${e.c}">
+      <div class="eq-top">
+        <span class="eq-freq" style="color:${e.c}">${e.f}</span>
+        <span class="eq-action" style="color:${e.c};background:${e.c}18">${e.a}</span>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:4px">${e.r}</div>
+      <div style="font-size:12px;color:#64748b;line-height:1.5">${e.w}</div>
+    </div>`).join('')}
+    <div class="card" style="margin-top:8px">
+      <div style="font-size:12px;font-weight:800;color:#3b82f6;letter-spacing:1.5px;margin-bottom:14px">HOW TO APPLY IN YOUR EQ</div>
+      ${[
+        ['1','Open your EQ plugin on the vocal track'],
+        ['2','Double-click the frequency area you want to change'],
+        ['3','A dot appears — drag DOWN to cut, drag UP to boost'],
+        ['4','Right-click the dot to change filter type if needed'],
+        ['5','Listen in real time — trust your ears over numbers'],
+        ['6','Toggle the plugin bypass on and off to compare']
+      ].map(([n,t])=>`
+      <div class="flex items-start gap8" style="margin-bottom:10px">
+        <div style="width:24px;height:24px;border-radius:6px;background:#3b82f620;border:1.5px solid #3b82f650;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#3b82f6;flex-shrink:0">${n}</div>
+        <div style="font-size:12px;color:#94a3b8;line-height:1.5;padding-top:3px">${t}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function render(){
+  const screens={home:renderHome,chain:renderChain,rules:renderRules,eq:renderEQ};
+  document.getElementById('screen').innerHTML=(screens[S.tab]||renderHome)();
+
+  ['home','chain','rules','eq'].forEach(id=>{
+    const el=document.getElementById(`nl-${id}`);
+    if(el) el.style.color=S.tab===id?(DAW_META[S.daw]?.color||'#f59e0b'):'#334155';
+  });
+
+  const navDots=document.querySelectorAll('.nav-dot');
+  navDots.forEach(d=>d.remove());
+  const activeBtn=document.querySelector(`.nav-btn[onclick="goTab('${S.tab}')"]`);
+  if(activeBtn){const dot=document.createElement('div');dot.className='nav-dot';activeBtn.appendChild(dot);}
+
+  document.getElementById('screen').scrollTop=0;
+}
+
+render();
+</script>
+<!-- ===== CLOUDY AI RECORD BOOTH (injected) ===== -->
+<style>
+#boothScreen{flex:1;overflow-y:auto;padding:16px 16px 110px;display:none}
+.bt-card{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:18px;margin-bottom:14px}
+.bt-head{font-size:11px;font-weight:800;letter-spacing:2px;margin-bottom:12px}
+.bt-status{font-size:12px;font-weight:700;color:#94a3b8;min-height:16px;margin-top:10px;line-height:1.5}
+.bt-timer{font-size:34px;font-weight:900;color:#e2e8f0;text-align:center;letter-spacing:2px;font-variant-numeric:tabular-nums;margin:4px 0 10px}
+.bt-meter{height:10px;background:#080810;border:1px solid #1e293b;border-radius:5px;overflow:hidden;margin-bottom:14px}
+.bt-meter-bar{height:100%;width:0%;background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444);transition:width .06s linear}
+.bt-row{display:flex;gap:10px}
+.bt-btn{flex:1;border-radius:12px;padding:14px 6px;font-size:12px;font-weight:900;letter-spacing:1px;border:1.5px solid #1e293b;color:#e2e8f0;background:#080810}
+.bt-btn:disabled{opacity:.35}
+.bt-btn:active:not(:disabled){transform:scale(.97)}
+.bt-rec{background:#ef4444;border-color:#ef4444;color:#fff}
+.bt-rec.recording{animation:btPulse 1.1s infinite}
+@keyframes btPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 9px rgba(239,68,68,0)}}
+.bt-amber{background:#f59e0b;border-color:#f59e0b;color:#080810}
+.bt-slider-row{margin-bottom:12px}
+.bt-slider-row label{display:flex;justify-content:space-between;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#64748b;margin-bottom:6px}
+.bt-slider-row input[type=range]{width:100%;accent-color:#f59e0b}
+.bt-lib-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #1e293b}
+.bt-lib-row:last-child{border-bottom:none}
+.bt-lib-name{flex:1;font-size:12px;font-weight:700;color:#e2e8f0;line-height:1.4;word-break:break-word}
+.bt-lib-date{font-size:10px;color:#475569;margin-top:2px}
+.bt-mini{border:1.5px solid #1e293b;border-radius:8px;padding:8px 11px;font-size:10px;font-weight:900;letter-spacing:1px;color:#94a3b8;flex-shrink:0}
+.bt-note{font-size:11px;color:#475569;line-height:1.6;margin-top:10px}
+.bt-warn{font-size:11px;font-weight:700;color:#ef4444;background:#1a0a0a;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.5}
+#btToast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);max-width:340px;width:calc(100% - 48px);background:#0f172a;border:1.5px solid #f59e0b;color:#e2e8f0;font-size:12px;font-weight:700;border-radius:10px;padding:12px 14px;z-index:9000;display:none;text-align:center;line-height:1.4}
+</style>
+<script>
+(function(){
+'use strict';
+
+// ── State ──────────────────────────────────────────────
+var B = {
+  beatBlob:null, beatName:null, beatURL:null, beatEl:null, beatDur:0,
+  stream:null, rec:null, chunks:[], recState:'idle', recElapsed:0, recStartTs:0,
+  vocalBlob:null, vocalURL:null, vocalEl:null, takeSaved:false,
+  playState:'idle', playTimer:null,
+  nudge:0, beatGain:1, vocalGain:1,
+  ctx:null, analyser:null, meterOn:false, timerInt:null
+};
+var MIC_OK = !!(window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+// ── Build UI ───────────────────────────────────────────
+var booth = document.createElement('div');
+booth.id = 'boothScreen';
+booth.innerHTML =
+  '<div class="bt-card">'+
+    '<div class="bt-head" style="color:#f59e0b">&#127908; RECORD BOOTH</div>'+
+    '<div style="font-size:12px;color:#64748b;line-height:1.6">Lay rehearsal demos over your beat &mdash; capture ideas, check your timing. 100% offline.</div>'+
+    (MIC_OK ? '' : '<div class="bt-warn" style="margin-top:12px;margin-bottom:0">&#9888; The microphone only works in the installed app (or on localhost). Opening this file straight in a browser blocks mic access &mdash; browser security, not a bug. Beat playback and your library still work here.</div>')+
+  '</div>'+
+
+  '<div class="bt-card">'+
+    '<div class="bt-head" style="color:#3b82f6">1 &middot; BEAT</div>'+
+    '<input type="file" id="btFile" accept="audio/*" style="display:none">'+
+    '<div id="btBeatEmpty"><button class="bt-btn bt-amber" id="btLoadBeat" style="width:100%">LOAD BEAT (MP3 / WAV)</button>'+
+      '<div class="bt-note">Or skip this and record a cappella to catch an idea.</div></div>'+
+    '<div id="btBeatInfo" style="display:none">'+
+      '<div style="font-size:13px;font-weight:800;color:#e2e8f0;margin-bottom:2px;word-break:break-word" id="btBeatName"></div>'+
+      '<div style="font-size:11px;color:#475569;margin-bottom:12px" id="btBeatDur"></div>'+
+      '<div class="bt-slider-row"><label><span>BEAT VOLUME</span><span id="btBeatVolVal">100%</span></label>'+
+      '<input type="range" id="btBeatVol" min="0" max="100" value="100"></div>'+
+      '<button class="bt-mini" id="btChangeBeat" style="width:100%">CHANGE BEAT</button>'+
+    '</div>'+
+  '</div>'+
+
+  '<div class="bt-card">'+
+    '<div class="bt-head" style="color:#ef4444">2 &middot; RECORD</div>'+
+    '<div class="bt-timer" id="btTimer">00:00</div>'+
+    '<div class="bt-meter"><div class="bt-meter-bar" id="btMeterBar"></div></div>'+
+    '<div class="bt-row">'+
+      '<button class="bt-btn bt-rec" id="btRec">&#9679; RECORD</button>'+
+      '<button class="bt-btn" id="btPause" disabled>&#10074;&#10074; PAUSE</button>'+
+      '<button class="bt-btn" id="btStop" disabled>&#9632; STOP</button>'+
+    '</div>'+
+    '<div class="bt-status" id="btStatus">'+(MIC_OK?'Ready. Use headphones so the beat stays out of your mic.':'Mic locked in browser mode &mdash; install the APK to record.')+'</div>'+
+  '</div>'+
+
+  '<div class="bt-card" id="btTakeCard" style="display:none">'+
+    '<div class="bt-head" style="color:#10b981">3 &middot; YOUR TAKE</div>'+
+    '<div class="bt-row" style="margin-bottom:14px">'+
+      '<button class="bt-btn bt-amber" id="btPlay">&#9654; PLAY</button>'+
+      '<button class="bt-btn" id="btStopPlay" disabled>&#9632; STOP</button>'+
+    '</div>'+
+    '<div class="bt-slider-row"><label><span>VOCAL VOLUME</span><span id="btVocVolVal">100%</span></label>'+
+    '<input type="range" id="btVocVol" min="0" max="100" value="100"></div>'+
+    '<div class="bt-slider-row"><label><span>VOCAL TIMING NUDGE</span><span id="btNudgeVal">0 ms</span></label>'+
+    '<input type="range" id="btNudge" min="-300" max="300" step="10" value="0">'+
+    '<div class="bt-note" style="margin-top:4px">Slide left = vocal earlier, right = later. Applies when you press play / export.</div></div>'+
+    '<div class="bt-row" style="margin-bottom:10px">'+
+      '<button class="bt-btn" id="btSaveTake">&#128190; SAVE TO LIBRARY</button>'+
+    '</div>'+
+    '<div class="bt-row" style="margin-bottom:10px">'+
+      '<button class="bt-btn" id="btExportMix">&#11015; MIX (WAV)</button>'+
+      '<button class="bt-btn" id="btExportVoc">&#11015; VOCAL ONLY</button>'+
+    '</div>'+
+    '<div class="bt-row"><button class="bt-btn" id="btDiscard" style="color:#ef4444;border-color:rgba(239,68,68,.4)">&#128465; DISCARD TAKE</button></div>'+
+  '</div>'+
+
+  '<div class="bt-card">'+
+    '<div class="bt-head" style="color:#6366f1">LIBRARY</div>'+
+    '<div id="btLibList"><div class="bt-note" style="margin-top:0">No saved takes yet.</div></div>'+
+  '</div>';
+
+var appEl = document.getElementById('app');
+appEl.insertBefore(booth, document.getElementById('nav'));
+
+var toast = document.createElement('div');
+toast.id = 'btToast';
+document.body.appendChild(toast);
+
+// nav button
+var navEl = document.getElementById('nav');
+var navBtn = document.createElement('button');
+navBtn.className = 'nav-btn';
+navBtn.setAttribute('onclick', "goTab('booth')");
+navBtn.innerHTML = '<span class="nav-icon">&#127908;</span><span class="nav-label" id="nl-booth" style="color:#334155">BOOTH</span>';
+navEl.appendChild(navBtn);
+
+// ── Render patch (booth tab show/hide) ─────────────────
+var origRender = window.render;
+window.render = function(){
+  var scr = document.getElementById('screen');
+  if(S.tab === 'booth'){
+    scr.style.display = 'none';
+    booth.style.display = 'block';
+    ['home','chain','rules','eq','booth'].forEach(function(id){
+      var el = document.getElementById('nl-'+id);
+      if(el) el.style.color = (id==='booth') ? '#f59e0b' : '#334155';
+    });
+    var dots = document.querySelectorAll('.nav-dot');
+    for(var i=0;i<dots.length;i++) dots[i].remove();
+    var dot = document.createElement('div'); dot.className='nav-dot';
+    navBtn.appendChild(dot);
+  } else {
+    booth.style.display = 'none';
+    scr.style.display = '';
+    origRender();
+    var bl = document.getElementById('nl-booth');
+    if(bl) bl.style.color = '#334155';
+  }
+};
+
+// ── Helpers ────────────────────────────────────────────
+function $(id){ return document.getElementById(id); }
+function showToast(msg, ms){
+  toast.textContent = msg; toast.style.display = 'block';
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ toast.style.display='none'; }, ms||2600);
+}
+function setStatus(msg){ $('btStatus').textContent = msg; }
+function fmt(ms){
+  var s = Math.floor(ms/1000);
+  return ('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);
+}
+function safePlay(el){ var p = el.play(); if(p && p.catch) p.catch(function(){}); }
+function pickMime(){
+  var list = ['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+  if(window.MediaRecorder && MediaRecorder.isTypeSupported){
+    for(var i=0;i<list.length;i++){ if(MediaRecorder.isTypeSupported(list[i])) return list[i]; }
+  }
+  return '';
+}
+function extFor(type){
+  if(!type) return 'webm';
+  if(type.indexOf('mp4')>-1) return 'm4a';
+  if(type.indexOf('ogg')>-1) return 'ogg';
+  if(type.indexOf('wav')>-1) return 'wav';
+  return 'webm';
+}
+function stamp(){
+  var d = new Date();
+  function p(n){ return ('0'+n).slice(-2); }
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds());
+}
+function blobToB64(blob){
+  return new Promise(function(res, rej){
+    var r = new FileReader();
+    r.onload = function(){ res(String(r.result).split(',')[1]); };
+    r.onerror = function(){ rej(r.error || new Error('read failed')); };
+    r.readAsDataURL(blob);
+  });
+}
+function decodeBlob(ctx, blob){
+  return blob.arrayBuffer().then(function(ab){
+    return new Promise(function(res, rej){ ctx.decodeAudioData(ab, res, rej); });
+  });
+}
+function getCtx(){
+  if(!B.ctx) B.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if(B.ctx.state === 'suspended') B.ctx.resume();
+  return B.ctx;
+}
+
+// ── Beat loading ───────────────────────────────────────
+function setBeat(file){
+  if(B.beatURL) URL.revokeObjectURL(B.beatURL);
+  B.beatBlob = file; B.beatName = file.name;
+  B.beatURL = URL.createObjectURL(file);
+  B.beatEl = new Audio(B.beatURL);
+  B.beatEl.preload = 'auto';
+  B.beatEl.onloadedmetadata = function(){
+    B.beatDur = B.beatEl.duration;
+    $('btBeatDur').textContent = isFinite(B.beatDur) ? ('Length: '+fmt(B.beatDur*1000)) : '';
+  };
+  B.beatEl.onerror = function(){ showToast('Could not read that audio file. Try MP3 or WAV.'); };
+  $('btBeatEmpty').style.display = 'none';
+  $('btBeatInfo').style.display = 'block';
+  $('btBeatName').textContent = B.beatName;
+  setStatus('Beat loaded. Hit RECORD when ready.');
+}
+$('btLoadBeat').onclick = function(){ $('btFile').click(); };
+$('btChangeBeat').onclick = function(){
+  if(B.recState !== 'idle'){ showToast('Stop recording first.'); return; }
+  stopPlayback();
+  $('btFile').click();
+};
+$('btFile').onchange = function(e){
+  if(e.target.files && e.target.files[0]) setBeat(e.target.files[0]);
+  e.target.value = '';
+};
+$('btBeatVol').oninput = function(){
+  B.beatGain = this.value/100;
+  $('btBeatVolVal').textContent = this.value+'%';
+  if(B.beatEl) B.beatEl.volume = B.beatGain;
+};
+
+// ── Level meter + timer ────────────────────────────────
+function startMeter(){
+  try{
+    var ctx = getCtx();
+    var src = ctx.createMediaStreamSource(B.stream);
+    B.analyser = ctx.createAnalyser();
+    B.analyser.fftSize = 512;
+    src.connect(B.analyser); // NOT connected to speakers -> no feedback
+    B.meterOn = true;
+    var data = new Uint8Array(B.analyser.fftSize);
+    (function loop(){
+      if(!B.meterOn) return;
+      B.analyser.getByteTimeDomainData(data);
+      var peak = 0;
+      for(var i=0;i<data.length;i++){ var v = Math.abs(data[i]-128)/128; if(v>peak) peak = v; }
+      $('btMeterBar').style.width = (B.recState==='rec' ? Math.min(100, peak*140) : 0)+'%';
+      requestAnimationFrame(loop);
+    })();
+  }catch(e){ /* meter is cosmetic - never block recording */ }
+}
+function stopMeter(){ B.meterOn = false; $('btMeterBar').style.width = '0%'; }
+function startTimer(){
+  clearInterval(B.timerInt);
+  B.timerInt = setInterval(function(){
+    var ms = B.recElapsed + (B.recState==='rec' ? Date.now()-B.recStartTs : 0);
+    $('btTimer').textContent = fmt(ms);
+  }, 250);
+}
+
+// ── Recording (beat + recorder pause/resume in sync) ───
+async function startRec(){
+  if(B.recState !== 'idle') return;
+  if(!MIC_OK){ showToast('Mic needs the installed app.'); return; }
+  if(B.vocalBlob && !B.takeSaved){
+    if(!confirm('Recording again replaces your current unsaved take. Continue?')) return;
+  }
+  stopPlayback();
+  try{
+    B.stream = await navigator.mediaDevices.getUserMedia({
+      audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false }
+    });
+  }catch(e){
+    setStatus('Mic permission denied. Allow microphone access and try again.');
+    showToast('Microphone blocked.');
+    return;
+  }
+  var mime = pickMime();
+  try{ B.rec = mime ? new MediaRecorder(B.stream, {mimeType:mime}) : new MediaRecorder(B.stream); }
+  catch(e){ B.rec = new MediaRecorder(B.stream); }
+  B.chunks = [];
+  B.rec.ondataavailable = function(e){ if(e.data && e.data.size) B.chunks.push(e.data); };
+  B.rec.onstop = onRecStopped;
+  if(B.beatEl){
+    B.beatEl.loop = false;
+    B.beatEl.currentTime = 0;
+    B.beatEl.volume = B.beatGain;
+    safePlay(B.beatEl);
+  }
+  B.rec.start(250);
+  B.recState = 'rec';
+  B.recElapsed = 0;
+  B.recStartTs = Date.now();
+  startMeter(); startTimer(); updateUI();
+  setStatus(B.beatEl ? 'Recording - beat is playing. Pause stops both together.' : 'Recording a cappella.');
+}
+function pauseRec(){
+  if(B.recState === 'rec'){
+    try{ B.rec.pause(); }catch(e){}
+    if(B.beatEl) B.beatEl.pause();
+    B.recElapsed += Date.now() - B.recStartTs;
+    B.recState = 'paused';
+    setStatus('Paused - beat and vocal frozen together. Hit RESUME to continue.');
+  } else if(B.recState === 'paused'){
+    if(B.beatEl) safePlay(B.beatEl);
+    try{ B.rec.resume(); }catch(e){}
+    B.recStartTs = Date.now();
+    B.recState = 'rec';
+    setStatus('Recording resumed.');
+  }
+  updateUI();
+}
+function stopRec(){
+  if(B.recState === 'idle') return;
+  if(B.recState === 'rec') B.recElapsed += Date.now() - B.recStartTs;
+  B.recState = 'idle';
+  try{ B.rec.stop(); }catch(e){}
+  if(B.beatEl){ B.beatEl.pause(); B.beatEl.currentTime = 0; }
+  stopMeter();
+  clearInterval(B.timerInt);
+  updateUI();
+}
+function onRecStopped(){
+  if(B.stream) B.stream.getTracks().forEach(function(t){ t.stop(); });
+  if(!B.chunks.length){ setStatus('Nothing was recorded.'); return; }
+  var type = (B.rec && B.rec.mimeType) || 'audio/webm';
+  B.vocalBlob = new Blob(B.chunks, {type:type});
+  B.takeSaved = false;
+  if(B.vocalURL) URL.revokeObjectURL(B.vocalURL);
+  B.vocalURL = URL.createObjectURL(B.vocalBlob);
+  B.vocalEl = new Audio(B.vocalURL);
+  B.vocalEl.preload = 'auto';
+  setStatus('Take ready ('+fmt(B.recElapsed)+'). Play it back below.');
+  updateUI();
+}
+$('btRec').onclick = startRec;
+$('btPause').onclick = pauseRec;
+$('btStop').onclick = stopRec;
+
+// ── Take playback (beat + vocal together, with nudge) ──
+function playTake(){
+  if(!B.vocalEl) return;
+  stopPlayback();
+  B.vocalEl.volume = B.vocalGain;
+  B.vocalEl.currentTime = 0;
+  B.vocalEl.onended = onPlayEnded;
+  if(B.beatEl){
+    B.beatEl.volume = B.beatGain;
+    B.beatEl.currentTime = 0;
+    B.beatEl.onended = onPlayEnded;
+  }
+  B.playState = 'playing';
+  var n = B.nudge;
+  if(!B.beatEl){
+    safePlay(B.vocalEl);
+  } else if(n >= 0){
+    safePlay(B.beatEl);
+    B.playTimer = setTimeout(function(){ if(B.playState==='playing') safePlay(B.vocalEl); }, n);
+  } else {
+    safePlay(B.vocalEl);
+    B.playTimer = setTimeout(function(){ if(B.playState==='playing') safePlay(B.beatEl); }, -n);
+  }
+  setStatus('Playing your take.');
+  updateUI();
+}
+function stopPlayback(){
+  clearTimeout(B.playTimer);
+  if(B.vocalEl){ B.vocalEl.pause(); B.vocalEl.currentTime = 0; B.vocalEl.onended = null; }
+  if(B.beatEl && B.recState==='idle'){ B.beatEl.pause(); B.beatEl.currentTime = 0; B.beatEl.onended = null; }
+  B.playState = 'idle';
+  updateUI();
+}
+function onPlayEnded(){
+  var vDone = !B.vocalEl || B.vocalEl.ended || B.vocalEl.paused;
+  var bDone = !B.beatEl || B.beatEl.ended || B.beatEl.paused;
+  if(vDone && bDone){ B.playState = 'idle'; setStatus('Take ready.'); updateUI(); }
+}
+$('btPlay').onclick = playTake;
+$('btStopPlay').onclick = stopPlayback;
+$('btVocVol').oninput = function(){
+  B.vocalGain = this.value/100;
+  $('btVocVolVal').textContent = this.value+'%';
+  if(B.vocalEl) B.vocalEl.volume = B.vocalGain;
+};
+$('btNudge').oninput = function(){
+  B.nudge = parseInt(this.value, 10) || 0;
+  $('btNudgeVal').textContent = B.nudge+' ms';
+};
+
+// ── Discard ────────────────────────────────────────────
+$('btDiscard').onclick = function(){
+  if(!confirm('Discard this take?')) return;
+  stopPlayback();
+  if(B.vocalURL) URL.revokeObjectURL(B.vocalURL);
+  B.vocalBlob = null; B.vocalURL = null; B.vocalEl = null; B.takeSaved = false;
+  setStatus('Take discarded. Ready to record.');
+  updateUI();
+};
+
+// ── Export: WAV mix / vocal only ───────────────────────
+function bufferToWav(buf){
+  var nCh = Math.min(2, buf.numberOfChannels), sr = buf.sampleRate, len = buf.length;
+  var bytes = 44 + len*nCh*2;
+  var ab = new ArrayBuffer(bytes), v = new DataView(ab), p = 0;
+  function ws(s){ for(var i=0;i<s.length;i++) v.setUint8(p++, s.charCodeAt(i)); }
+  function u32(x){ v.setUint32(p, x, true); p += 4; }
+  function u16(x){ v.setUint16(p, x, true); p += 2; }
+  ws('RIFF'); u32(bytes-8); ws('WAVE'); ws('fmt '); u32(16); u16(1); u16(nCh);
+  u32(sr); u32(sr*nCh*2); u16(nCh*2); u16(16); ws('data'); u32(len*nCh*2);
+  var ch = [];
+  for(var c=0;c<nCh;c++) ch.push(buf.getChannelData(c));
+  for(var i=0;i<len;i++){
+    for(var c2=0;c2<nCh;c2++){
+      var s = Math.max(-1, Math.min(1, ch[c2][i]));
+      v.setInt16(p, s<0 ? s*0x8000 : s*0x7FFF, true); p += 2;
+    }
+  }
+  return new Blob([ab], {type:'audio/wav'});
+}
+async function saveBlobToPhone(blob, name){
+  var FS = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
+  if(FS){
+    var b64;
+    try{ b64 = await blobToB64(blob); }
+    catch(e){ showToast('Could not read audio data.'); return; }
+    try{ await FS.requestPermissions(); }catch(e){}
+    try{
+      await FS.writeFile({path:'CloudyAI/'+name, data:b64, directory:'DOCUMENTS', recursive:true});
+      showToast('Saved: Documents/CloudyAI/'+name, 4000); return;
+    }catch(e){}
+    try{
+      await FS.writeFile({path:'CloudyAI/'+name, data:b64, directory:'DATA', recursive:true});
+      showToast('Saved in app storage: '+name, 4000); return;
+    }catch(e){}
+  }
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+  showToast('Download started: '+name, 3500);
+}
+async function exportMix(){
+  if(!B.vocalBlob) return;
+  if(!B.beatBlob){ exportVocal(); return; }
+  setStatus('Rendering mix... (a few seconds)');
+  try{
+    var ctx = getCtx();
+    var beatBuf = await decodeBlob(ctx, B.beatBlob);
+    var vocBuf = await decodeBlob(ctx, B.vocalBlob);
+    var n = B.nudge/1000;
+    var vocStart = Math.max(0, n), beatStart = Math.max(0, -n);
+    var dur = Math.max(beatBuf.duration + beatStart, vocBuf.duration + vocStart) + 0.1;
+    var sr = 44100;
+    var off = new OfflineAudioContext(2, Math.ceil(dur*sr), sr);
+    function add(buf, when, gain){
+      var src = off.createBufferSource(); src.buffer = buf;
+      var g = off.createGain(); g.gain.value = gain;
+      src.connect(g); g.connect(off.destination); src.start(when);
+    }
+    add(beatBuf, beatStart, B.beatGain);
+    add(vocBuf, vocStart, B.vocalGain);
+    var rendered = await off.startRendering();
+    await saveBlobToPhone(bufferToWav(rendered), 'CloudyAI-demo-'+stamp()+'.wav');
+    setStatus('Mix exported.');
+  }catch(e){
+    setStatus('Mix render failed on this device - use VOCAL ONLY export instead.');
+    showToast('Mix failed: '+(e && e.message ? e.message : 'decode error'));
+  }
+}
+function exportVocal(){
+  if(!B.vocalBlob) return;
+  saveBlobToPhone(B.vocalBlob, 'CloudyAI-vocal-'+stamp()+'.'+extFor(B.vocalBlob.type));
+}
+$('btExportMix').onclick = exportMix;
+$('btExportVoc').onclick = exportVocal;
+
+// ── Library (IndexedDB - offline, survives restarts) ───
+function openDB(){
+  return new Promise(function(res, rej){
+    var r = indexedDB.open('cloudy_booth', 1);
+    r.onupgradeneeded = function(){ r.result.createObjectStore('takes', {keyPath:'id', autoIncrement:true}); };
+    r.onsuccess = function(){ res(r.result); };
+    r.onerror = function(){ rej(r.error); };
+  });
+}
+function dbReq(req){
+  return new Promise(function(res, rej){
+    req.onsuccess = function(){ res(req.result); };
+    req.onerror = function(){ rej(req.error); };
+  });
+}
+async function saveTake(){
+  if(!B.vocalBlob){ return; }
+  try{
+    var d = await openDB();
+    var all = await dbReq(d.transaction('takes').objectStore('takes').getAll());
+    var rec = {
+      name: 'Take '+(all.length+1)+' \u00b7 '+(B.beatName || 'a cappella'),
+      date: Date.now(),
+      beatName: B.beatName || null,
+      beatBlob: B.beatBlob || null,
+      vocalBlob: B.vocalBlob,
+      nudge: B.nudge, beatGain: B.beatGain, vocalGain: B.vocalGain,
+      length: B.recElapsed
+    };
+    await dbReq(d.transaction('takes','readwrite').objectStore('takes').add(rec));
+    B.takeSaved = true;
+    showToast('Saved to library: '+rec.name);
+    refreshLib();
+  }catch(e){
+    showToast('Save failed: '+(e && e.message ? e.message : 'storage error'));
+  }
+}
+$('btSaveTake').onclick = saveTake;
+async function refreshLib(){
+  var box = $('btLibList');
+  try{
+    var d = await openDB();
+    var all = await dbReq(d.transaction('takes').objectStore('takes').getAll());
+    if(!all.length){ box.innerHTML = '<div class="bt-note" style="margin-top:0">No saved takes yet.</div>'; return; }
+    all.sort(function(a,b){ return b.date - a.date; });
+    box.innerHTML = '';
+    all.forEach(function(t){
+      var row = document.createElement('div');
+      row.className = 'bt-lib-row';
+      var info = document.createElement('div');
+      info.className = 'bt-lib-name';
+      info.innerHTML = '<div></div><div class="bt-lib-date"></div>';
+      info.children[0].textContent = t.name;
+      info.children[1].textContent = new Date(t.date).toLocaleString() + (t.length ? ' \u00b7 '+fmt(t.length) : '');
+      var bLoad = document.createElement('button');
+      bLoad.className = 'bt-mini'; bLoad.textContent = 'LOAD';
+      bLoad.onclick = function(){ loadTake(t.id); };
+      var bDel = document.createElement('button');
+      bDel.className = 'bt-mini'; bDel.style.color = '#ef4444'; bDel.textContent = 'DEL';
+      bDel.onclick = function(){ deleteTake(t.id, t.name); };
+      row.appendChild(info); row.appendChild(bLoad); row.appendChild(bDel);
+      box.appendChild(row);
+    });
+  }catch(e){
+    box.innerHTML = '<div class="bt-note" style="margin-top:0">Library unavailable on this device.</div>';
+  }
+}
+async function loadTake(id){
+  if(B.recState !== 'idle'){ showToast('Stop recording first.'); return; }
+  try{
+    var d = await openDB();
+    var t = await dbReq(d.transaction('takes').objectStore('takes').get(id));
+    if(!t){ showToast('Take not found.'); return; }
+    stopPlayback();
+    if(B.vocalURL) URL.revokeObjectURL(B.vocalURL);
+    if(B.beatURL) URL.revokeObjectURL(B.beatURL);
+    B.vocalBlob = t.vocalBlob;
+    B.vocalURL = URL.createObjectURL(t.vocalBlob);
+    B.vocalEl = new Audio(B.vocalURL);
+    B.takeSaved = true;
+    B.recElapsed = t.length || 0;
+    B.nudge = t.nudge || 0;
+    B.beatGain = (typeof t.beatGain === 'number') ? t.beatGain : 1;
+    B.vocalGain = (typeof t.vocalGain === 'number') ? t.vocalGain : 1;
+    if(t.beatBlob){
+      B.beatBlob = t.beatBlob; B.beatName = t.beatName;
+      B.beatURL = URL.createObjectURL(t.beatBlob);
+      B.beatEl = new Audio(B.beatURL);
+      $('btBeatEmpty').style.display = 'none';
+      $('btBeatInfo').style.display = 'block';
+      $('btBeatName').textContent = B.beatName || '';
+      $('btBeatDur').textContent = '';
+    } else {
+      B.beatBlob = null; B.beatName = null; B.beatURL = null; B.beatEl = null;
+      $('btBeatEmpty').style.display = 'block';
+      $('btBeatInfo').style.display = 'none';
+    }
+    $('btNudge').value = B.nudge; $('btNudgeVal').textContent = B.nudge+' ms';
+    $('btVocVol').value = Math.round(B.vocalGain*100); $('btVocVolVal').textContent = Math.round(B.vocalGain*100)+'%';
+    $('btBeatVol').value = Math.round(B.beatGain*100); $('btBeatVolVal').textContent = Math.round(B.beatGain*100)+'%';
+    $('btTimer').textContent = fmt(B.recElapsed);
+    setStatus('Loaded: '+t.name);
+    updateUI();
+  }catch(e){ showToast('Could not load take.'); }
+}
+async function deleteTake(id, name){
+  if(!confirm('Delete "'+name+'" forever?')) return;
+  try{
+    var d = await openDB();
+    await dbReq(d.transaction('takes','readwrite').objectStore('takes').delete(id));
+    refreshLib();
+    showToast('Deleted.');
+  }catch(e){ showToast('Delete failed.'); }
+}
+
+// ── UI state machine ───────────────────────────────────
+function updateUI(){
+  var rec = B.recState;
+  $('btRec').disabled = (rec !== 'idle') || !MIC_OK;
+  $('btRec').classList.toggle('recording', rec === 'rec');
+  $('btRec').innerHTML = rec === 'idle' ? '&#9679; RECORD' : '&#9679; RECORDING';
+  $('btPause').disabled = (rec === 'idle');
+  $('btPause').innerHTML = rec === 'paused' ? '&#9654; RESUME' : '&#10074;&#10074; PAUSE';
+  $('btStop').disabled = (rec === 'idle');
+  $('btTakeCard').style.display = B.vocalBlob ? 'block' : 'none';
+  if(B.vocalBlob){
+    $('btPlay').disabled = (B.playState === 'playing') || (rec !== 'idle');
+    $('btStopPlay').disabled = (B.playState !== 'playing');
+    $('btSaveTake').innerHTML = B.takeSaved ? '&#10003; SAVED' : '&#128190; SAVE TO LIBRARY';
+    $('btSaveTake').disabled = B.takeSaved;
+  }
+  if(rec === 'idle' && !B.vocalBlob) $('btTimer').textContent = '00:00';
+}
+
+// persist storage so Android doesn't clear the library
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+
+refreshLib();
+updateUI();
+})();
+</script>
+<!-- ===== END RECORD BOOTH ===== -->
+
+<!-- ===== CLOUDY AI OFFLINE LOGIN (injected) ===== -->
+<style>
+#lockScreen{position:fixed;inset:0;z-index:9999;background:#080810;display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .3s ease}
+#lockScreen .lk-wrap{width:100%;max-width:340px}
+#lockScreen .lk-logo{text-align:center;margin-bottom:26px}
+#lockScreen .lk-cloud{font-size:40px;margin-bottom:8px}
+#lockScreen .lk-title{font-size:22px;font-weight:900;letter-spacing:3px;color:#e2e8f0}
+#lockScreen .lk-title span{color:#f59e0b}
+#lockScreen .lk-sub{font-size:9px;font-weight:800;letter-spacing:4px;color:#475569;margin-top:5px}
+#lockScreen .lk-card{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:22px}
+#lockScreen .lk-head{font-size:11px;font-weight:800;letter-spacing:2px;color:#f59e0b;margin-bottom:14px}
+#lockScreen .lk-hello{font-size:16px;font-weight:800;color:#e2e8f0;margin-bottom:14px}
+#lockScreen label{display:block;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#64748b;margin:0 0 6px 2px}
+#lockScreen input{width:100%;background:#080810;border:1px solid #1e293b;border-radius:10px;padding:13px 14px;color:#e2e8f0;font-size:15px;margin-bottom:14px;outline:none}
+#lockScreen input:focus{border-color:#f59e0b}
+#lockScreen .lk-btn{width:100%;background:#f59e0b;color:#080810;font-size:13px;font-weight:900;letter-spacing:1.5px;border-radius:10px;padding:14px;margin-top:4px}
+#lockScreen .lk-btn:active{transform:scale(.98)}
+#lockScreen .lk-err{display:none;font-size:12px;font-weight:700;color:#ef4444;background:#1a0a0a;border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+#lockScreen .lk-reset{display:block;text-align:center;font-size:11px;font-weight:700;color:#475569;margin-top:16px;background:none;width:100%}
+#lockScreen .lk-note{font-size:10px;color:#334155;text-align:center;margin-top:14px;line-height:1.5}
+</style>
+<div id="lockScreen">
+  <div class="lk-wrap">
+    <div class="lk-logo">
+      <div class="lk-cloud">&#9729;&#65039;</div>
+      <div class="lk-title">CLOUDY <span>AI</span></div>
+      <div class="lk-sub">STUDIO GUIDE</div>
+    </div>
+    <div class="lk-card" id="lockCard"></div>
+  </div>
+</div>
+<script>
+function caSha256(ascii){
+function rightRotate(value, amount){return (value>>>amount)|(value<<(32-amount));}
+var mathPow=Math.pow, maxWord=mathPow(2,32), lengthProperty='length', i, j, result='';
+var words=[], asciiBitLength=ascii[lengthProperty]*8;
+var hash=caSha256.h=caSha256.h||[], k=caSha256.k=caSha256.k||[];
+var primeCounter=k[lengthProperty];
+var isComposite={};
+for(var candidate=2; primeCounter<64; candidate++){
+  if(!isComposite[candidate]){
+    for(i=0;i<313;i+=candidate){isComposite[i]=candidate;}
+    hash[primeCounter]=(mathPow(candidate,.5)*maxWord)|0;
+    k[primeCounter++]=(mathPow(candidate,1/3)*maxWord)|0;
+  }
+}
+ascii+='\x80';
+while(ascii[lengthProperty]%64-56) ascii+='\x00';
+for(i=0;i<ascii[lengthProperty];i++){
+  j=ascii.charCodeAt(i);
+  if(j>>8) return;
+  words[i>>2]|=j<<((3-i)%4)*8;
+}
+words[words[lengthProperty]]=((asciiBitLength/maxWord)|0);
+words[words[lengthProperty]]=(asciiBitLength);
+for(j=0;j<words[lengthProperty];){
+  var w=words.slice(j,j+=16);
+  var oldHash=hash;
+  hash=hash.slice(0,8);
+  for(i=0;i<64;i++){
+    var w15=w[i-15], w2=w[i-2];
+    var a=hash[0], e=hash[4];
+    var temp1=hash[7]
+      +(rightRotate(e,6)^rightRotate(e,11)^rightRotate(e,25))
+      +((e&hash[5])^((~e)&hash[6]))
+      +k[i]
+      +(w[i]=(i<16)?w[i]:(
+          w[i-16]
+          +(rightRotate(w15,7)^rightRotate(w15,18)^(w15>>>3))
+          +w[i-7]
+          +(rightRotate(w2,17)^rightRotate(w2,19)^(w2>>>10))
+        )|0
+      );
+    var temp2=(rightRotate(a,2)^rightRotate(a,13)^rightRotate(a,22))
+      +((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+    hash=[(temp1+temp2)|0].concat(hash);
+    hash[4]=(hash[4]+temp1)|0;
+  }
+  for(i=0;i<8;i++){hash[i]=(hash[i]+oldHash[i])|0;}
+}
+for(i=0;i<8;i++){
+  for(j=3;j+1;j--){
+    var b=(hash[i]>>(j*8))&255;
+    result+=((b<16)?0:'')+b.toString(16);
+  }
+}
+return result;
+}
+(function(){
+  var PK='ca_profile';
+  var appEl=document.getElementById('app');
+  var screenEl=document.getElementById('lockScreen');
+  var card=document.getElementById('lockCard');
+  if(appEl) appEl.style.visibility='hidden';
+
+  function hashStr(s){ return caSha256(unescape(encodeURIComponent(s))); }
+  function randSalt(){
+    try{
+      var a=new Uint8Array(8); crypto.getRandomValues(a);
+      return Array.prototype.map.call(a,function(b){return ('0'+b.toString(16)).slice(-2);}).join('');
+    }catch(e){ return (Math.random().toString(16)+Math.random().toString(16)).replace(/0\./g,'').slice(0,16); }
+  }
+  function getProfile(){ try{ return JSON.parse(localStorage.getItem(PK)||'null'); }catch(e){ return null; } }
+  function showErr(msg){ var e=document.getElementById('lkErr'); e.textContent=msg; e.style.display='block'; }
+  function unlock(){
+    screenEl.style.opacity='0';
+    if(appEl) appEl.style.visibility='visible';
+    setTimeout(function(){ screenEl.style.display='none'; },320);
+  }
+  function bindEnter(btnId){
+    Array.prototype.forEach.call(card.querySelectorAll('input'),function(inp){
+      inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ document.getElementById(btnId).click(); } });
+    });
+  }
+
+  function renderCreate(){
+    card.innerHTML=
+      '<div class="lk-head">CREATE YOUR PROFILE</div>'+
+      '<div class="lk-err" id="lkErr"></div>'+
+      '<label>YOUR NAME</label>'+
+      '<input id="lkName" type="text" autocomplete="off" placeholder="e.g. Zaza">'+
+      '<label>PASSWORD</label>'+
+      '<input id="lkPw" type="password" placeholder="At least 4 characters">'+
+      '<label>CONFIRM PASSWORD</label>'+
+      '<input id="lkPw2" type="password" placeholder="Repeat password">'+
+      '<button class="lk-btn" id="lkCreate">CREATE &amp; ENTER STUDIO</button>'+
+      '<div class="lk-note">Stored only on this device. Works fully offline.<br>No internet, no account, no recovery &mdash; remember it.</div>';
+    document.getElementById('lkCreate').onclick=function(){
+      var name=document.getElementById('lkName').value.trim();
+      var pw=document.getElementById('lkPw').value;
+      var pw2=document.getElementById('lkPw2').value;
+      if(!name){ showErr('Enter your name.'); return; }
+      if(pw.length<4){ showErr('Password needs at least 4 characters.'); return; }
+      if(pw!==pw2){ showErr('Passwords do not match.'); return; }
+      var salt=randSalt();
+      localStorage.setItem(PK, JSON.stringify({name:name, salt:salt, hash:hashStr(salt+pw)}));
+      unlock();
+    };
+    bindEnter('lkCreate');
+    setTimeout(function(){ var n=document.getElementById('lkName'); if(n) n.focus(); },50);
+  }
+
+  function renderUnlock(p){
+    card.innerHTML=
+      '<div class="lk-head">LOCKED</div>'+
+      '<div class="lk-hello">Welcome back, '+String(p.name).replace(/[<>&]/g,'')+'</div>'+
+      '<div class="lk-err" id="lkErr"></div>'+
+      '<label>PASSWORD</label>'+
+      '<input id="lkPw" type="password" placeholder="Enter your password">'+
+      '<button class="lk-btn" id="lkUnlock">UNLOCK</button>'+
+      '<button class="lk-reset" id="lkReset">Not you? Reset profile</button>';
+    document.getElementById('lkUnlock').onclick=function(){
+      var pw=document.getElementById('lkPw').value;
+      if(hashStr(p.salt+pw)===p.hash){ unlock(); }
+      else{ showErr('Wrong password. Try again.'); document.getElementById('lkPw').value=''; }
+    };
+    document.getElementById('lkReset').onclick=function(){
+      if(confirm('Reset profile? You will create a new name and password. Your guide progress stays saved.')){
+        localStorage.removeItem(PK);
+        renderCreate();
+      }
+    };
+    bindEnter('lkUnlock');
+    setTimeout(function(){ var f=document.getElementById('lkPw'); if(f) f.focus(); },50);
+  }
+
+  var prof=getProfile();
+  if(prof && prof.hash && prof.salt){ renderUnlock(prof); } else { renderCreate(); }
+})();
+</script>
+<!-- ===== END LOGIN ===== -->
+
+</body>
+</html>
